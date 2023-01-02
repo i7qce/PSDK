@@ -7,17 +7,23 @@
 <body>
 
     <div class="tracker_TL">
-        
-        {% if pagetype == 0 %}
-        Projects
-        {% elif pagetype == 1%}
-        Tasks
-        {% endif %}
-        <hr>
+        <span class="tracker_header"></span>
+            {% if pagetype == 0 %}
+            <span style="color: white;" class="h3">Projects</span>
+            <span style="float:right; color: rgb(108, 108, 108);" class="h3"> Last Modified </span>
+            {% elif pagetype == 1%}
+            <span style="color: white;" class="h3">Tasks</span>
+            <span style="float:right; color: rgb(108, 108, 108);" class="h3"> Status </span>
+            {% endif %}
+            <hr style="border: 1px dotted white">
+        <span class="tracker_header"></span>
+
+
+
         <div id="tracker_contents">
-        <!-- {% for project in projects %}
-        <li> <a href="/tracker">{{project}}</a> <span style="float:right"> Dec 22, 2022 </span>  </li>  <hr>
-        {% endfor %} -->
+            <!-- {% for project in projects %}
+            <li> <a href="/tracker">{{project}}</a> <span style="float:right"> Dec 22, 2022 </span>  </li>  <hr>
+            {% endfor %} -->
         </div>
 
     </div>
@@ -29,86 +35,105 @@
 <script>
 
 $( document ).ready(function() {
-$.getJSON( "./tracker_json", function( data ) {
-    console.log(data.projects);
+    reload_page();
+});
 
+$(document).on('click', '#newtask', function() { 
+    
+    var task_text = $('#newtask').prev().val();
     var urlParams = new URLSearchParams(window.location.search); //get all parameters
     var pid = urlParams.get('project_id'); //extract the foo parameter - this will return NULL if foo isn't a parameter
 
-    if(pid) { //check if foo parameter is set to anything
-        for(var task in data.projects[pid].tasks) {
-
-        $('#tracker_contents').append(data.projects[pid].tasks[task].name + 
-        '<span style="float:right">' + //data.projects[pid].tasks[task].date_modified + 
-        '</span>'+ '<span style="float:right">' +
-            '<select name="cars" id="cars" value=' + 
-            data.projects[pid].tasks[task].status + 
-            '><option value="todo">To Do</option><option value="inprogress">In Progress</option><option value="done">Done</option><option value="abandoned">Abandoned</option></select></span>  </li><hr>');
-        } 
-
-
-        $('#tracker_contents').append('<li> <input type="text"> </input> <button type="button" id="newtask">Add Task</button>  </li>') 
-
-    } else {
-        for(var key in data.projects) {
-        $('#tracker_contents').append('<li> <a href="/tracker?project_id=' + key + '">' + data.projects[key].name + '</a> <span style="float:right">' + data.projects[key].date_modified + '</span>  </li><hr> ');
-        } 
+    if (!check_if_empty(task_text)){
+        $.post('/new_task', {pid: pid, name: task_text}, function(response_from_server){
+                    //alert(response_from_server.modified_title);
+                    reload_page();
+        });
     }
 
 });
+
+$(document).on('click', '#newproject', function() { 
+    
+    var project_text = $('#newproject').prev().val();
+
+    if (!check_if_empty(project_text)){
+        $.post('/new_project', {name: project_text}, function(response_from_server){
+                    reload_page();
+        });
+    }
 });
 
+$(document).on('change', '.status_dropdown', function() { 
 
-$('#newtask').click(function(){
-
-    var task_text = $('#newtask').prev().val();
-
+    color_dropdowns();
+    var new_statuscode = $(this).val();
     var urlParams = new URLSearchParams(window.location.search); //get all parameters
     var pid = urlParams.get('project_id'); //extract the foo parameter - this will return NULL if foo isn't a parameter
+    var tid = $(this).attr('id')
 
-    $.post('/new_project', {pid: pid, name: task_text}, function(response_from_server){
-                //alert(response_from_server.modified_title);
-                //alert(response_from_server.modified_content);
-                //alert(response_from_server.modified_content_html);
-                alert('SUCSESS!');
+    $.post('/update_task', {pid: pid, tid: tid, new_statuscode: new_statuscode}, function(response_from_server){
+        reload_page();
+    });
 
-
-            } 
-            
-            );
 });
+
+function color_dropdowns(){
+    $(".todo").filter(':selected').parent().css('background-color', 'aqua')
+    $(".inprog").filter(':selected').parent().css('background-color', 'darkorange')
+    $(".done").filter(':selected').parent().css('background-color', '#50fa7b')
+    $(".aban").filter(':selected').parent().css('background-color', 'crimson')
+}
+
+function check_if_empty(text){
+    // Check if text is all whitespace
+    return (!text || text.trim() === "");
+}
 
 function reload_page(){
   // remove all current things
   // re-render
 
   $('#tracker_contents').empty()
-  
+
   $.getJSON( "./tracker_json", function( data ) {
     console.log(data.projects);
 
     var urlParams = new URLSearchParams(window.location.search); //get all parameters
     var pid = urlParams.get('project_id'); //extract the foo parameter - this will return NULL if foo isn't a parameter
 
-    if(pid) { //check if foo parameter is set to anything
-        for(var task in data.projects[pid].tasks) {
+    if(pid) { //check if we are on the main page or a project page
+        var tasks = data.projects[pid].tasks;
 
-        $('#tracker_contents').append(data.projects[pid].tasks[task].name + 
-        '<span style="float:right">' + //data.projects[pid].tasks[task].date_modified + 
-        '</span>'+ '<span style="float:right">' +
-            '<select name="cars" id="cars" value=' + 
-            data.projects[pid].tasks[task].status + 
-            '><option value="todo">To Do</option><option value="inprogress">In Progress</option><option value="done">Done</option><option value="abandoned">Abandoned</option></select></span>  </li><hr>');
+        tasks = Object.keys(tasks).sort((a, b) => {
+            if (tasks[a].statuscode < tasks[b].statuscode) return -1;
+            if (tasks[a].statuscode > tasks[b].statuscode) return 1;
+            return 0;
+        });
+
+        for(const task of tasks) {
+            if(task && data.projects[pid].tasks[task].statuscode != -1){
+                $('#tracker_contents').append(data.projects[pid].tasks[task].name + 
+                '<span style="float:right">' + //data.projects[pid].tasks[task].date_modified + 
+                '</span>'+ '<span style="float:right">' +
+                '<select name="status_dropdown" id="'+ task +'" class="status_dropdown" ' + 
+                '><option value="1" class="todo">To Do</option><option value="0" class="inprog">In Progress</option><option value="2" class="done">Done</option><option value="-1" class="aban">Abandoned</option></select></span>  </li><hr>');
+                
+                $('#' + task).val(data.projects[pid].tasks[task].statuscode)
+            }
         } 
-
-
+        
         $('#tracker_contents').append('<li> <input type="text"> </input> <button type="button" id="newtask">Add Task</button>  </li>') 
 
     } else {
         for(var key in data.projects) {
         $('#tracker_contents').append('<li> <a href="/tracker?project_id=' + key + '">' + data.projects[key].name + '</a> <span style="float:right">' + data.projects[key].date_modified + '</span>  </li><hr> ');
         } 
+
+        $('#tracker_contents').append('<li> <input type="text"> </input> <button type="button" id="newproject">Add Project</button>  </li>') 
     }
+
+    color_dropdowns();
 
 });
 

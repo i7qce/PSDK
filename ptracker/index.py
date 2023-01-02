@@ -4,6 +4,7 @@ from flask_sqlalchemy import SQLAlchemy, model
 from sqlalchemy import func
 import json
 import utils
+import os
 
 import markdown
 
@@ -233,10 +234,14 @@ def tracker():
 
 	current_project_id = request.args.get('project_id')
 	
-	with open('tracker_files/db.json', 'r') as f:
-		project_dict = json.load(f)
-
-	projects = list(project_dict['projects'].keys())
+	if os.path.exists('tracker_files/db.json'):
+		with open('tracker_files/db.json', 'r') as f:
+			project_dict = json.load(f)
+		projects = list(project_dict['projects'].keys())
+	else:
+		with open('tracker_files/db.json', 'w') as f:
+			json.dump({"projects":{}, "max_id":0}, f)
+			projects = []
 
 	if current_project_id == None:
 		return render_template('render_tracker.html', projects=projects, pagetype=0)
@@ -469,6 +474,36 @@ def new_task():
 	pid = submitted_data.get('pid')
 	name = submitted_data.get('name')
 
-	utils.add_task(pid, name)
+	utils.add_task(name, pid)
 	
-	return jsonify(modified_title=newTitle)
+	return jsonify(returnval={})
+
+@app.route('/update_task', methods=['post'])
+def update_task():
+
+	# from ajax, get new task
+	# add to db.json 
+	# send status back to reload json
+
+	submitted_data = request.form.to_dict()
+	pid = submitted_data.get('pid')
+	tid = submitted_data.get('tid')
+	new_statuscode = submitted_data.get('new_statuscode')
+
+	utils.update_task(pid, tid, new_statuscode)
+	
+	return jsonify(returnval={})
+
+@app.route('/new_project', methods=['post'])
+def new_project():
+
+	# from ajax, get new task
+	# add to db.json 
+	# send status back to reload json
+
+	submitted_data = request.form.to_dict()
+	name = submitted_data.get('name')
+
+	utils.add_project(name)
+
+	return jsonify(returnval={})

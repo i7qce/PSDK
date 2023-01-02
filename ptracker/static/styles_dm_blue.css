@@ -209,25 +209,32 @@ body {
     color: white;
   }
 
+  .tracker_header >  {
+    color: var(--main_txt_color);
+  }
 
   .tracker_TL {
     float: left;
-    padding-left: 25%;
+    padding-left: 15%;
     padding-top: 20px;
 
     height: 92vh;  /*Should be removed. Only for demonstration */
     background-color: var(--main_bg_color);
     min-height: 100%;
 
-    width: 75%;
+    width: 85%;
     overflow-y: auto;
     overflow-x: hidden;
     font-weight: normal;
 
-    color: var(--main_txt_color); /* color of central column */
+    color: rgb(173, 173, 173); /*var(--main_txt_color); /* color of central column */
     font-weight: 200;
     line-height: 27px;
 
+  }
+
+  .tracker_TL hr {
+    border: 1px solid rgba(188, 188, 188, 0.511);
   }
 
   .tracker_TL li {
