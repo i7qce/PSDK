@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+  {% include 'header.html' %}
+</head>
+
+
+<body>
+
+
+
+<div class="row">
+  <div class="column left">
+    <ul class="leftnav">
+    </ul>
+
+  </div>
+  <div class="column middle">
+
+
+    <h3>Deleting {{to_delete_type}} "{{to_delete_title}}" </h3>
+    <hr />
+
+
+    <form action="" method="post">
+
+        <input type = "hidden" name = "to_delete_type" value = {{to_delete_type}} />
+        <input type = "hidden" name = "to_delete_id" value = {{to_delete_id}} />
+
+        <p>
+            <label for="confirmation">Enter "delete" to confirm that you want to delete this!</label>
+            <input type="text" autocomplete="off" name="confirmation" required >
+        </p>
+
+        <p>
+            <input type="submit">
+        </p>
+    </form>
+
+
+
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <div class="column right">
+    <ul class="leftnav">
+
+    </ul>
+  </div>
+</div>
+
+</body>
+</html>

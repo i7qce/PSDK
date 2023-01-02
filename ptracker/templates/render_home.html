@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+{% include 'header.html' %}
+</head>
+
+
+
+
+
+
+<body>
+
+
+<div class="row">
+  <div class="column left">
+    <ul class="leftnav sec_links">
+        <li class="toc_header">Sections   <a href="/add_section"><i class="fa fa-plus-circle add_link"></i></a> </li>
+        {% for section in sections|sort(attribute='order_id') %}
+            {% if section.subsections|length == 1 %}
+            <li> <a href="{{ '/?subsection_id=%s'%section.subsections[0].id }}" class='menu_links'>{{ section.title }} </a> </li>
+            {% endif %}
+            {% if section.subsections|length > 1 %}
+              <li class="collapse"> <a class="collapse menu_links" href="javascript:void(0);">  {{ section.title }} ⌄ </a>  
+                <ul class="collapsible">
+                {% for subsection in section.subsections[1:]|sort(attribute='order_id') %}
+                    <li> <a href="{{ '/?subsection_id=%s'%subsection.id }}" class='menu_links'>{{ subsection.title }} </a> </li>
+                {% endfor %}
+                </ul>
+              </li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+
+  </div>
+  <div class="column middle main_txt_col">
+
+
+
+    {% if viewing_content %}
+      <h1>{{ current_subsection[0].title }} <a href="{{ '/edit_section?current_subsection_id=%s'%current_subsection[0].id }}"><i class="fa fa-pencil edit_button" style="float:right; font-size:16px" aria-hidden="true"></i> </a>  </h1>
+    {% else  %}
+      <h1>Personal Wiki</h1>
+    {% endif %}
+    <hr />
+
+    {% if viewing_content %}
+      {% for chapter in chapters %}
+        <!--- old version to take use to dedicated edit page, depricated--->
+        <!--- h2 id={{chapter.id}}>  <span> {{ chapter.title }}  &nbsp; </span> <a href="{{ '/edit_chapter?current_chapter_id=%s'%chapter.id }}"><i class="fa fa-pencil" style="float:right; color:rgba(0,0,0,0.1); font-size: 16px;" aria-hidden="true"></i> </a>  </h2> --->
+        <h2 id={{chapter.id}}>  <span class='displayed_title'> {{ chapter.title }}  &nbsp; </span> <span class='edit_title'> <input type="text" name="title" value='{{ chapter.title }}' hidden>  &nbsp; </span>        <a href="javascript:void(0);"><i class="fa fa-pencil edit_toggle edit_button" style="float:right; font-size: 16px;" aria-hidden="true"></i> </a>       <a href="javascript:void(0);" hidden>  <i class="fa fa-save save_edits edit_button" style="float:right; padding-right:8px; font-size: 16px;" aria-hidden="true"></i> </a>        <a href="{{ '/delete?to_delete_type=Chapter&to_delete_id=%s'%chapter.id }}" hidden><i class="fa fa-trash edit_button" style="float:right; font-size: 16px; padding-right:8px;" aria-hidden="true"></i> </a>  </h2>
+        <span class='displayed_content'>{{chapter.content_html|safe }}</span>
+        <textarea class='edit_box' class={{chapter.id}} style="width:100%; height:300px;" hidden>{{chapter.content_markdown}}</textarea>
+      {% endfor %}
+    {% endif %}
+
+    
+    {% if not viewing_content %}
+
+    <p> Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum <a href="http://www.wikipedia.org"> Wikipedia </a>, $ \omega^2 $ 
+       
+      $$\lambda = \frac{1}{2}\sum_{n\ne k} \frac{\Gamma(\pi)}{(n-k)!!}$$ 
+       
+    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum
+    </p> 
+         
+         <h2>Continuing </h2>
+
+         <p> Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum 
+          
+          <blockquote>
+            <p><em> This is a quote! </em></p>
+          </blockquote> Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum
+          </p>
+    
+    {% endif %}
+
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <div class="column right">
+    <ul class="leftnav rightnav">
+        {% if viewing_content %}
+        <li class="toc_header"> Table of Contents <a href="{{ '/add_chapter?current_subsection_id=%s'%current_subsection[0].id }}"><i class="fa fa-plus-circle add_link"></i></a> </li>
+        <!-- <li> {{ current_subsection[0].title }} </li> -->
+          {% for chapter in chapters %}
+            <li class="toc_links">  <a href="{{ '#%s'%chapter.id }}" class='menu_links'> {{ chapter.title }}  </a>  </li>
+          {% endfor %}
+        {% endif %}
+    </ul>
+  </div>
+</div>
+
+
+
+<!-- collapsable lists, collapse all but uncollapse current, change color of current -->
+<script>
+  $('.collapse').next(".collapsible").children().hide()
+
+  $("a[href$='" + $(location).attr('href').split("?")[1] + "']").parent().parent().filter(".collapsible").children().show()
+
+  $("a[href$='" + $(location).attr('href').split("?")[1] + "']").filter(".menu_links").attr('style','color:' + $('body').css('--link_color') + '!important')
+  
+  $('.collapse').click(function() {
+      $(this).next(".collapsible").children().slideToggle(100);
+  });
+  </script>
+
+
+</body>
+</html>

@@ -1,0 +1,431 @@
+from sys import set_coroutine_origin_tracking_depth
+from flask import Flask, jsonify, escape, request, render_template, redirect, url_for
+from flask_sqlalchemy import SQLAlchemy, model
+from sqlalchemy import func
+
+import markdown
+
+markdown_extension_list = ['tables', 'pymdownx.tasklist', 'fenced_code', 'codehilite', 'footnotes', 'attr_list', 'wikilinks', 'sane_lists','pymdownx.magiclink','pymdownx.tilde']
+
+app = Flask(__name__, static_url_path='/static')
+
+# DATABASE CONFIGURATION ####################################################
+
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///reorder.db'
+db = SQLAlchemy(app)
+
+#helper function to assign order_id to each entry
+def increment_default_order_section(context):
+	max_order_id = db.session.query(func.max(Section.order_id)).all()[0][0]
+	if max_order_id == None:
+		return 1
+	else:
+		return max_order_id + 1
+
+def increment_default_order_subsection(context):
+	max_order_id = db.session.query(func.max(Subsection.order_id)).all()[0][0]
+	if max_order_id == None:
+		return 1
+	else:
+		return max_order_id + 1
+
+def increment_default_order_chapter(context):
+	max_order_id = db.session.query(func.max(Chapter.order_id)).all()[0][0]
+	if max_order_id == None:
+		return 1
+	else:
+		return max_order_id + 1	
+
+#Database schema definition
+class Section(db.Model):
+	id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+	order_id = db.Column(db.Integer, default=increment_default_order_section)
+	title = db.Column(db.String, unique=False,nullable=False)
+	has_subsections = db.Column(db.Integer)
+
+	subsections = db.relationship('Subsection', backref='section', lazy=True, cascade="all, delete-orphan")
+
+	def __repr__(self):
+		return '<Section %r>' % self.title
+	
+class Subsection(db.Model):
+	id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+	title = db.Column(db.String, unique=False,nullable=False)
+	order_id = db.Column(db.Integer, default=increment_default_order_subsection)
+	is_root_subsection = db.Column(db.Integer)
+
+
+	chapters = db.relationship('Chapter', backref='subsection', lazy=True, cascade="all, delete-orphan")
+
+	section_id = db.Column(db.Integer, db.ForeignKey('section.id'), nullable=False)
+
+	def __repr__(self):
+		return '<Subsection %r>' % self.title
+	
+class Chapter(db.Model):
+	id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+	title = db.Column(db.String, unique=False,nullable=False)
+	order_id = db.Column(db.Integer, default=increment_default_order_chapter)
+	content_markdown = db.Column(db.String, unique=False,nullable=False)
+	content_html = db.Column(db.String, unique=False,nullable=False)
+	
+	subsection_id = db.Column(db.Integer, db.ForeignKey('subsection.id'), nullable=False)
+
+	def __repr__(self):
+		return '<Chapter %r>' % self.title
+	
+
+# Usage of markdown dumping/loading utilities
+
+# dump_db_to_md('example.md')
+# _ = load_md_to_current_db('example.md', db)
+
+
+def dump_db_to_md(output_file, extra_header_char='-=-=-'):
+	sections = Section.query.all()
+	for section in sections:
+		with open(output_file, 'a') as f:
+			f.write('# ' + extra_header_char + ' ' + section.title + '\n\n')
+		subsections = section.subsections
+		for subsection in subsections:
+			with open(output_file, 'a') as f:
+				f.write('## ' + 4*extra_header_char + ' ' + subsection.title + '\n\n')
+			chapters = subsection.chapters
+			for chapter in chapters:
+				with open(output_file, 'a') as f:
+					f.write('### ' + 8*extra_header_char + ' ' + chapter.title + '\n\n')
+					f.write(chapter.content_markdown + '\n\n')
+
+def read_md(md_file):
+
+	with open(md_file, 'r') as f:
+		contents = f.readlines()
+
+	return contents
+
+
+def load_md_to_current_db(md_file, db, extra_header_char='-=-=-'):
+	# usage:
+	#NOTE: MAKE SURE DB File is correct above!
+	# run python -i index.py
+	# _ = load_md_to_current_db('markdown_to_load.md', db)
+	
+	contents = read_md(md_file)
+
+	#app = Flask(__name__, static_url_path='/static')
+	#app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + db_file
+	#db = SQLAlchemy(app)
+
+	db.create_all()
+	db.session.commit()
+
+	# # Top level
+	# ## Subsections
+	# ### subsubsections
+
+	delims = ['# ' + extra_header_char + ' ', '## ' + 4*extra_header_char + ' ', '### ' + 8*extra_header_char + ' ']
+
+	# stream-reading
+	# go line-by-line
+
+	sections = {idx: title for idx, title in enumerate(contents) if title[0:len(delims[0])]==delims[0]}
+
+	subsections = {idx: title for idx, title in enumerate(contents) if title[0:len(delims[1])]==delims[1]}
+
+	chapters = {idx: title for idx, title in enumerate(contents) if title[0:len(delims[2])]==delims[2]}
+
+	all_special_idxs = sorted(list(sections.keys()) + list(subsections.keys()) + list(chapters.keys()) + [len(contents)])
+
+	contents_dict = {}
+	
+	current_section_idx = 0
+	current_subsection_idx = 0
+
+	for iter1 in range(len(contents)):
+
+		if iter1 in list(sections.keys()):
+			current_section_idx = iter1
+			contents_dict[iter1] = [sections[iter1], {}]
+		if iter1 in list(subsections.keys()):
+			current_subsection_idx = iter1
+			contents_dict[current_section_idx][1][current_subsection_idx] = [subsections[iter1], {}]
+		if iter1 in list(chapters.keys()):
+
+			end_idx = all_special_idxs[all_special_idxs.index(iter1) + 1]
+
+			contents_dict[current_section_idx][1][current_subsection_idx][1][iter1] = [chapters[iter1], ''.join(contents[iter1+1:end_idx])]
+	
+	# add sections to database
+	# if only has 1 subsection w/ same title, vs otherwise
+
+	for section in contents_dict.keys():
+
+			if len(contents_dict[section][1].keys()) == 1:
+				has_subsections = 0
+			else:
+				has_subsections = 1
+
+			section_title = contents_dict[section][0].split(delims[0])[-1].rstrip()
+
+			new_section = Section( title=section_title,  has_subsections=has_subsections )
+			db.session.add(new_section)
+			db.session.commit()
+
+			subsections = contents_dict[section][1]
+
+			for subsection in subsections.keys():
+				subsection_title = subsections[subsection][0].split(delims[1])[-1].rstrip()
+
+				if len(subsections[subsection][1].keys()) == 0 and subsection_title == section_title:
+					new_subsection = Subsection(title=subsection_title, section_id = new_section.id, is_root_subsection=1  ) 
+					db.session.add(new_subsection )
+					db.session.commit()
+				else:
+					new_subsection = Subsection(title=subsection_title, section_id = new_section.id, is_root_subsection=0  )
+					db.session.add(new_subsection )
+					db.session.commit()
+				
+				chapters = subsections[subsection][1]
+
+				for chapter in chapters:
+					chapter_title = chapters[chapter][0].split(delims[2])[-1].rstrip()
+					content = chapters[chapter][1]
+					current_subsection_id =  new_subsection.id
+					content_html = markdown.markdown(content, extensions=markdown_extension_list)
+					new_chapter = Chapter(title=chapter_title, content_markdown=content, content_html=content_html,  subsection_id= current_subsection_id)
+					db.session.add(   new_chapter    )
+					db.session.commit()
+
+			
+	return contents_dict
+
+
+
+# URL ROUTING ###############################################################
+
+@app.route('/')
+def home():
+	
+	sections = Section.query.all()
+	current_subsection_id = request.args.get('subsection_id')
+	if current_subsection_id == None:
+		viewing_content = 0
+	else:
+		viewing_content = 1
+	
+	current_subsection = Subsection.query.filter_by(id=current_subsection_id).all()
+	if viewing_content:
+		chapters = current_subsection[0].chapters
+	else:
+		chapters = None
+
+	print('Chapters: ' + str(len(Chapter.query.all())))
+	print('Subsections: ' + str(len(Subsection.query.all())))
+	print('Sections: ' + str(len(Section.query.all())))
+
+	return render_template('render_home.html', sections=sections, viewing_content=viewing_content, current_subsection=current_subsection, chapters = chapters )
+
+
+
+
+@app.route('/add_section', methods=['post', 'get'])
+def add_section():
+
+	if request.method == 'POST':
+		title = request.form.get('title')
+		tl_section = request.form.get('parent')
+		first_sub_title = request.form.get('sub_title')
+		if tl_section == "None" and first_sub_title == "": #just section
+			new_section = Section( title=title,  has_subsections=0 )
+			db.session.add(new_section)
+			db.session.commit()
+			db.session.add( Subsection(title=title, section_id = new_section.id, is_root_subsection=1  ) )
+			db.session.commit()
+		elif tl_section != "None": #add subsection to existing section
+			parent_section = Section.query.filter_by(id=tl_section).all()
+			db.session.add( Subsection(title=title, section_id = parent_section[0].id, is_root_subsection=0  ) )
+			db.session.commit()
+		else: #add section + seperate subsection
+			new_section = Section( title=title,  has_subsections=1 )
+			db.session.add(new_section)
+			db.session.commit()
+			db.session.add( Subsection(title=title, section_id = new_section.id, is_root_subsection=1  ) )
+			db.session.add( Subsection(title=first_sub_title, section_id = new_section.id, is_root_subsection=0  ) )
+			db.session.commit()
+		
+		return redirect('/')
+
+
+	sections = Section.query.filter_by(has_subsections=1).all()
+
+	return render_template('add_section.html', sections=sections)
+
+
+
+
+@app.route('/add_chapter', methods=['post', 'get'])
+def add_chapter():
+	
+	if request.method == 'POST':
+		title = request.form.get('title')
+		content = request.form.get('content')
+		current_subsection_id =  request.form.get('current_subsection_id')
+		content_html = markdown.markdown(content, extensions=markdown_extension_list)
+		new_chapter = Chapter(title=title, content_markdown=content, content_html=content_html,  subsection_id= current_subsection_id)
+		db.session.add(   new_chapter    )
+		db.session.commit()
+		return redirect('/?subsection_id=' + current_subsection_id + '#' + str(new_chapter.id) )
+
+	current_subsection_id = request.args.get('current_subsection_id')
+
+	return render_template('add_chapter.html', current_subsection_id=current_subsection_id)
+
+
+
+
+@app.route('/edit_chapter', methods=['post', 'get'])
+def edit_chapter():
+
+	if request.method == 'POST':
+		current_chapter_id =  request.form.get('current_chapter_id')
+		title = request.form.get('title')
+		content = request.form.get('content')
+
+		current_chapter = Chapter.query.filter_by(id=current_chapter_id).all()
+		current_chapter[0].title = title
+		current_chapter[0].content_markdown = content
+		current_chapter[0].content_html = markdown.markdown(content, extensions=markdown_extension_list)
+
+		db.session.commit()
+
+		current_subsection_id = str(current_chapter[0].subsection.id)
+
+		return redirect('/?subsection_id=' + current_subsection_id + '#' + str(current_chapter[0].id) ) 
+
+
+	current_chapter_id = request.args.get('current_chapter_id')
+	current_chapter = Chapter.query.filter_by(id=current_chapter_id).all()
+	title = current_chapter[0].title
+	print(title)
+	content = current_chapter[0].content_markdown
+	
+
+	return render_template('edit_chapter.html', title=title, content=content, current_chapter_id=current_chapter_id)
+
+
+
+
+@app.route('/edit_section', methods=['post', 'get'])
+def edit_section():
+
+	if request.method == 'POST':
+		current_subsection_id =  request.form.get('current_subsection_id')
+		title = request.form.get('title')
+
+		current_subsection = Subsection.query.filter_by(id=current_subsection_id).all()
+		current_subsection[0].title = title
+
+		if current_subsection[0].is_root_subsection: #if root subsection, change parent title too, otherwise leave parent
+			current_subsection[0].section.title = title
+		else:
+			parent_title = request.form.get('parent_title')
+			current_subsection[0].section.title = parent_title
+
+		db.session.commit()
+
+		return redirect('/?subsection_id=' + current_subsection_id ) 
+
+
+	current_subsection_id = request.args.get('current_subsection_id')
+	current_subsection= Subsection.query.filter_by(id=current_subsection_id).all()
+	title = current_subsection[0].title
+	is_root_subsection = current_subsection[0].is_root_subsection
+	parent_title = current_subsection[0].section.title
+	parent_id = current_subsection[0].section.id
+	print(title)
+	
+
+	return render_template('edit_section.html', title=title, current_subsection_id=current_subsection_id, is_root_subsection=is_root_subsection, parent_title=parent_title, parent_id=parent_id)
+
+
+
+
+@app.route('/delete', methods=['post', 'get'])
+def delete():
+
+	if request.method == 'POST':
+		delete_confirmation = request.form.get('confirmation')
+		if delete_confirmation != "delete":
+			return redirect('/') 
+		
+		to_delete_type = request.form.get('to_delete_type')
+		to_delete_id = request.form.get('to_delete_id')
+
+		#to get cascading deletions working correctly, need to use db.session.delete on object, using .delete on return from filter doesn't cascade!
+
+		if to_delete_type == 'Section':
+			to_delete_section = Section.query.filter_by(id=to_delete_id).all()
+			db.session.delete(to_delete_section[0])
+		elif to_delete_type == 'Subsection':
+			to_delete_subsection = Subsection.query.filter_by(id=to_delete_id).all()
+			if to_delete_subsection[0].is_root_subsection:
+				db.session.delete(to_delete_subsection[0].section) #delete parent section, which will also remove subsection
+			else:
+				db.session.delete(to_delete_subsection[0])
+			
+		elif to_delete_type == 'Chapter':
+			Chapter.query.filter_by(id=to_delete_id).delete()
+
+		db.session.commit()
+
+		return redirect('/') 
+
+
+	to_delete_id = request.args.get('to_delete_id')
+	to_delete_type = request.args.get('to_delete_type')
+	if to_delete_type == "Section":
+		to_delete_section = Section.query.filter_by(id=to_delete_id).all()
+		to_delete_title = to_delete_section[0].title
+	elif to_delete_type == "Subsection":
+		to_delete_subsection = Subsection.query.filter_by(id=to_delete_id).all()
+		to_delete_title = to_delete_subsection[0].title
+	if to_delete_type == "Chapter":
+		to_delete_chapter = Chapter.query.filter_by(id=to_delete_id).all()
+		to_delete_title = to_delete_chapter[0].title
+	
+
+
+
+	return render_template('delete.html', to_delete_type=to_delete_type, to_delete_id=to_delete_id, to_delete_title=to_delete_title)
+
+
+
+
+@app.route('/reorder_content', methods=['post', 'get'])
+def reorder():
+	return render_template('reorder.html')
+
+
+
+@app.route('/update_async', methods=['post'])
+def update():
+	submitted_data = request.form.to_dict()
+	current_id = submitted_data.get('id')
+	newContent = submitted_data.get('content')
+	newTitle = submitted_data.get('title')
+
+	newContentHTML = markdown.markdown(newContent, extensions=markdown_extension_list)
+
+	print('editing ' + str(current_id) + ': ' + newTitle)
+
+	current_chapter = Chapter.query.filter_by(id=current_id).all()
+
+	#Do the updating
+	current_chapter[0].title = newTitle
+	current_chapter[0].content_markdown = newContent
+	current_chapter[0].content_html = newContentHTML
+
+	db.session.commit()
+	
+	return jsonify(modified_title=newTitle, modified_content=newContent, modified_content_html = newContentHTML)
