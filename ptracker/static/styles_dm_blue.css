@@ -210,6 +210,31 @@ body {
   }
 
 
+  .tracker_TL {
+    float: left;
+    padding-left: 25%;
+    padding-top: 20px;
+
+    height: 92vh;  /*Should be removed. Only for demonstration */
+    background-color: var(--main_bg_color);
+    min-height: 100%;
+
+    width: 75%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    font-weight: normal;
+
+    color: var(--main_txt_color); /* color of central column */
+    font-weight: 200;
+    line-height: 27px;
+
+  }
+
+  .tracker_TL li {
+    padding: 0;
+    list-style-type: none;
+  }
+
 
   .sec_links a {
     color: rgba(0,0,0,0.75);

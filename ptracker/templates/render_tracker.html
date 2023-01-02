@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+{% include 'header.html' %}
+</head>
+
+<body>
+
+    <div class="tracker_TL">
+        
+        {% if pagetype == 0 %}
+        Projects
+        {% elif pagetype == 1%}
+        Tasks
+        {% endif %}
+        <hr>
+        <div id="tracker_contents">
+        <!-- {% for project in projects %}
+        <li> <a href="/tracker">{{project}}</a> <span style="float:right"> Dec 22, 2022 </span>  </li>  <hr>
+        {% endfor %} -->
+        </div>
+
+    </div>
+    
+
+</body>
+</html>
+
+<script>
+
+$( document ).ready(function() {
+$.getJSON( "./tracker_json", function( data ) {
+    console.log(data.projects);
+
+    var urlParams = new URLSearchParams(window.location.search); //get all parameters
+    var pid = urlParams.get('project_id'); //extract the foo parameter - this will return NULL if foo isn't a parameter
+
+    if(pid) { //check if foo parameter is set to anything
+        for(var task in data.projects[pid].tasks) {
+
+        $('#tracker_contents').append(data.projects[pid].tasks[task].name + 
+        '<span style="float:right">' + //data.projects[pid].tasks[task].date_modified + 
+        '</span>'+ '<span style="float:right">' +
+            '<select name="cars" id="cars" value=' + 
+            data.projects[pid].tasks[task].status + 
+            '><option value="todo">To Do</option><option value="inprogress">In Progress</option><option value="done">Done</option><option value="abandoned">Abandoned</option></select></span>  </li><hr>');
+        } 
+
+
+        $('#tracker_contents').append('<li> <input type="text"> </input> <button type="button" id="newtask">Add Task</button>  </li>') 
+
+    } else {
+        for(var key in data.projects) {
+        $('#tracker_contents').append('<li> <a href="/tracker?project_id=' + key + '">' + data.projects[key].name + '</a> <span style="float:right">' + data.projects[key].date_modified + '</span>  </li><hr> ');
+        } 
+    }
+
+});
+});
+
+
+$('#newtask').click(function(){
+
+    var task_text = $('#newtask').prev().val();
+
+    var urlParams = new URLSearchParams(window.location.search); //get all parameters
+    var pid = urlParams.get('project_id'); //extract the foo parameter - this will return NULL if foo isn't a parameter
+
+    $.post('/new_project', {pid: pid, name: task_text}, function(response_from_server){
+                //alert(response_from_server.modified_title);
+                //alert(response_from_server.modified_content);
+                //alert(response_from_server.modified_content_html);
+                alert('SUCSESS!');
+
+
+            } 
+            
+            );
+});
+
+function reload_page(){
+  // remove all current things
+  // re-render
+
+  $('#tracker_contents').empty()
+  
+  $.getJSON( "./tracker_json", function( data ) {
+    console.log(data.projects);
+
+    var urlParams = new URLSearchParams(window.location.search); //get all parameters
+    var pid = urlParams.get('project_id'); //extract the foo parameter - this will return NULL if foo isn't a parameter
+
+    if(pid) { //check if foo parameter is set to anything
+        for(var task in data.projects[pid].tasks) {
+
+        $('#tracker_contents').append(data.projects[pid].tasks[task].name + 
+        '<span style="float:right">' + //data.projects[pid].tasks[task].date_modified + 
+        '</span>'+ '<span style="float:right">' +
+            '<select name="cars" id="cars" value=' + 
+            data.projects[pid].tasks[task].status + 
+            '><option value="todo">To Do</option><option value="inprogress">In Progress</option><option value="done">Done</option><option value="abandoned">Abandoned</option></select></span>  </li><hr>');
+        } 
+
+
+        $('#tracker_contents').append('<li> <input type="text"> </input> <button type="button" id="newtask">Add Task</button>  </li>') 
+
+    } else {
+        for(var key in data.projects) {
+        $('#tracker_contents').append('<li> <a href="/tracker?project_id=' + key + '">' + data.projects[key].name + '</a> <span style="float:right">' + data.projects[key].date_modified + '</span>  </li><hr> ');
+        } 
+    }
+
+});
+
+
+}
+
+</script>

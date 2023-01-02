@@ -2,6 +2,8 @@ from sys import set_coroutine_origin_tracking_depth
 from flask import Flask, jsonify, escape, request, render_template, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy, model
 from sqlalchemy import func
+import json
+import utils
 
 import markdown
 
@@ -226,8 +228,34 @@ def home():
 
 	return render_template('render_home.html', sections=sections, viewing_content=viewing_content, current_subsection=current_subsection, chapters = chapters )
 
+@app.route('/tracker')
+def tracker():
+
+	current_project_id = request.args.get('project_id')
+	
+	with open('tracker_files/db.json', 'r') as f:
+		project_dict = json.load(f)
+
+	projects = list(project_dict['projects'].keys())
+
+	if current_project_id == None:
+		return render_template('render_tracker.html', projects=projects, pagetype=0)
+	else:
+		return render_template('render_tracker.html', projects=projects, pagetype=1)
 
 
+		
+
+	
+
+
+@app.route('/tracker_json')
+def tracker_json():
+
+	with open('tracker_files/db.json', 'r') as f:
+		project_dict = json.load(f)
+	
+	return jsonify(project_dict)
 
 @app.route('/add_section', methods=['post', 'get'])
 def add_section():
@@ -429,3 +457,18 @@ def update():
 	db.session.commit()
 	
 	return jsonify(modified_title=newTitle, modified_content=newContent, modified_content_html = newContentHTML)
+
+@app.route('/new_task', methods=['post'])
+def new_task():
+
+	# from ajax, get new task
+	# add to db.json 
+	# send status back to reload json
+
+	submitted_data = request.form.to_dict()
+	pid = submitted_data.get('pid')
+	name = submitted_data.get('name')
+
+	utils.add_task(pid, name)
+	
+	return jsonify(modified_title=newTitle)
