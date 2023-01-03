@@ -33,7 +33,8 @@ def add_project(name, fil='tracker_files/db.json'):
 			"date_created_timestamp": time.time(),
 			"tasks": {}, 
 			"max_task_id": 0,
-			"description": 0
+			"description": 0,
+			"active": 1
 			}
 		}
 
