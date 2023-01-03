@@ -12,7 +12,7 @@
             <span style="color: white;" class="h3">Projects</span>
             <span style="float:right; color: rgb(108, 108, 108);" class="h3"> Last Modified </span>
             {% elif pagetype == 1%}
-            <span style="color: white;" class="h3">Tasks</span>
+            <span style="color: white;" class="h3">Tasks for <span id="task_project_title"></span></span>
             <span style="float:right; color: rgb(108, 108, 108);" class="h3"> Status </span>
             {% endif %}
             <hr style="border: 1px dotted white">
@@ -103,6 +103,7 @@ function reload_page(){
     var pid = urlParams.get('project_id'); //extract the foo parameter - this will return NULL if foo isn't a parameter
 
     if(pid) { //check if we are on the main page or a project page
+        $('#task_project_title').text(data.projects[pid].name)
         var tasks = data.projects[pid].tasks;
 
         tasks = Object.keys(tasks).sort((a, b) => {

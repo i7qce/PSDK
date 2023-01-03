@@ -1,7 +1,10 @@
 import json
 import os
 import datetime
+from zoneinfo import ZoneInfo
 import time
+
+server_timezone = "US/Eastern"
 
 def status_mapping(status_code):
 	status_map = {
@@ -24,9 +27,9 @@ def add_project(name, fil='tracker_files/db.json'):
 	adding_dict = {
 		project_dict['max_id'] + 1: {
 			"name": name, 
-			"date_modified": datetime.datetime.now().strftime("%b %d %Y"), 
+			"date_modified": datetime.datetime.now(ZoneInfo(server_timezone)).strftime("%b %d %Y"), 
 			"date_modified_timestamp": time.time(), 
-			"date_created": datetime.datetime.now().strftime("%b %d %Y"),
+			"date_created": datetime.datetime.now(ZoneInfo(server_timezone)).strftime("%b %d %Y"),
 			"date_created_timestamp": time.time(),
 			"tasks": {}, 
 			"max_task_id": 0,
@@ -58,9 +61,9 @@ def add_task(name, project_id, fil='tracker_files/db.json'):
 			"name": name,
 			"status": "To Do",
 			"statuscode": 1,
-			"date_modified": datetime.datetime.now().strftime("%b %d %Y"),
+			"date_modified": datetime.datetime.now(ZoneInfo(server_timezone)).strftime("%b %d %Y"),
 			"date_modified_timestamp": time.time(),
-			"date_created": datetime.datetime.now().strftime("%b %d %Y"),
+			"date_created": datetime.datetime.now(ZoneInfo(server_timezone)).strftime("%b %d %Y"),
 			"date_created_timestamp": time.time(),
 			"description": 0
 		}
@@ -70,7 +73,7 @@ def add_task(name, project_id, fil='tracker_files/db.json'):
 
 	# update timestamps for project HERE
 
-	project_dict['projects'][project_id]['date_modified'] = datetime.datetime.now().strftime("%b %d %Y")
+	project_dict['projects'][project_id]['date_modified'] = datetime.datetime.now(ZoneInfo(server_timezone)).strftime("%b %d %Y")
 	project_dict['projects'][project_id]['date_modified_timestamp'] = time.time()
 
 
@@ -91,10 +94,10 @@ def update_task(pid, tid, new_statuscode, fil='tracker_files/db.json'):
 
 	# update timestamps for project HERE
 
-	project_dict['projects'][pid]['date_modified'] = datetime.datetime.now().strftime("%b %d %Y")
+	project_dict['projects'][pid]['date_modified'] = datetime.datetime.now(ZoneInfo(server_timezone)).strftime("%b %d %Y")
 	project_dict['projects'][pid]['date_modified_timestamp'] = time.time()
 
-	project_dict['projects'][pid]['tasks'][tid]['date_modified'] = datetime.datetime.now().strftime("%b %d %Y")
+	project_dict['projects'][pid]['tasks'][tid]['date_modified'] = datetime.datetime.now(ZoneInfo(server_timezone)).strftime("%b %d %Y")
 	project_dict['projects'][pid]['tasks'][tid]['date_modified_timestamp'] = time.time()
 
 
