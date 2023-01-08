@@ -233,6 +233,7 @@ def home():
 def tracker():
 
 	current_project_id = request.args.get('project_id')
+	show_all = request.args.get('show_all')
 	
 	if os.path.exists('tracker_files/db.json'):
 		with open('tracker_files/db.json', 'r') as f:
@@ -243,8 +244,10 @@ def tracker():
 			json.dump({"projects":{}, "max_id":0}, f)
 			projects = []
 
-	if current_project_id == None:
+	if current_project_id == None and show_all == None:
 		return render_template('render_tracker.html', projects=projects, pagetype=0)
+	elif show_all:
+		return render_template('render_tracker.html', projects=projects, pagetype=2)
 	else:
 		return render_template('render_tracker.html', projects=projects, pagetype=1)
 

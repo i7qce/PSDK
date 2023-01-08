@@ -14,6 +14,9 @@
             {% elif pagetype == 1%}
             <span style="color: white;" class="h3">Tasks for <span id="task_project_title"></span></span>
             <span style="float:right; color: rgb(108, 108, 108);" class="h3"> Status </span>
+            {% elif pagetype == 2%}
+            <span style="color: white;" class="h3">Tasks in Progress <span id="task_project_title"></span></span>
+            <span style="float:right; color: rgb(108, 108, 108);" class="h3"> Status </span>
             {% endif %}
             <hr style="border: 1px dotted white">
         <span class="tracker_header"></span>
@@ -69,8 +72,15 @@ $(document).on('change', '.status_dropdown', function() {
     color_dropdowns();
     var new_statuscode = $(this).val();
     var urlParams = new URLSearchParams(window.location.search); //get all parameters
-    var pid = urlParams.get('project_id'); //extract the foo parameter - this will return NULL if foo isn't a parameter
-    var tid = $(this).attr('id')
+
+    if (urlParams.get('project_id')){
+        var pid = urlParams.get('project_id'); //extract the foo parameter - this will return NULL if foo isn't a parameter
+        var tid = $(this).attr('id')
+    } else if (urlParams.get('show_all')) {
+        var pid = $(this).attr('id').split('x')[0]
+        var tid = $(this).attr('id').split('x')[1]
+    }
+
 
     $.post('/update_task', {pid: pid, tid: tid, new_statuscode: new_statuscode}, function(response_from_server){
         reload_page();
@@ -101,6 +111,8 @@ function reload_page(){
 
     var urlParams = new URLSearchParams(window.location.search); //get all parameters
     var pid = urlParams.get('project_id'); //extract the foo parameter - this will return NULL if foo isn't a parameter
+    var show_all_type = urlParams.get('show_all'); //extract the foo parameter - this will return NULL if foo isn't a parameter
+
 
     if(pid) { //check if we are on the main page or a project page
         $('#task_project_title').text(data.projects[pid].name)
@@ -126,12 +138,37 @@ function reload_page(){
         
         $('#tracker_contents').append('<li> <input type="text"> </input> <button type="button" id="newtask">Add Task</button>  </li>') 
 
+    } else if (show_all_type) {
+        // Traverse data object
+        // if any tasks have in_progress setting, render
+
+        pids = Object.keys(data.projects)
+
+        for (const pid of pids){
+            
+            var tasks = data.projects[pid].tasks;
+            tasks = Object.keys(tasks)
+            
+            for (const task of tasks){
+                
+                if (data.projects[pid].tasks[task].statuscode == 0){
+                    $('#tracker_contents').append('<span style="color: darkorange;"><b>' + data.projects[pid].name + ': ' + '</b></span>' + data.projects[pid].tasks[task].name + 
+                    '<span style="float:right">' + //data.projects[pid].tasks[task].date_modified + 
+                    '</span>'+ '<span style="float:right">' +
+                    '<select name="status_dropdown" id="'+ pid + 'x' + task +'" class="status_dropdown" ' + 
+                    '><option value="1" class="todo">To Do</option><option value="0" class="inprog">In Progress</option><option value="2" class="done">Done</option><option value="-1" class="aban">Abandoned</option></select></span>  </li><hr>');
+                    
+                    $('#' + pid + 'x' + task).val(data.projects[pid].tasks[task].statuscode)
+                }
+
+            }
+        }
     } else {
         for(var key in data.projects) {
         $('#tracker_contents').append('<li> <a href="/tracker?project_id=' + key + '">' + data.projects[key].name + '</a> <span style="float:right">' + data.projects[key].date_modified + '</span>  </li><hr> ');
         } 
 
-        $('#tracker_contents').append('<li> <input type="text"> </input> <button type="button" id="newproject">Add Project</button>  </li>') 
+        $('#tracker_contents').append('<li> <input type="text"> </input> <button type="button" id="newproject">Add Project</button> <a style="float: right;" href=/tracker?show_all=inprog> View all In Progress </a>  </li>') 
     }
 
     color_dropdowns();
