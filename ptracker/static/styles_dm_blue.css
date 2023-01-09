@@ -71,6 +71,7 @@ body {
     background-color: var(--main_bg_color);
     /* font-size: 16px; */
     line-height: 20px;
+    padding-top: 45px;
 }
 
   /* Create three unequal columns that floats next to each other */
@@ -193,6 +194,9 @@ body {
     overflow: hidden;
     background-color: var(--main_bg_color);
     border-bottom: 1px solid rgba(42, 42, 42, 0.624);
+    position: fixed;
+    top: 0px;
+    width: 100%;
   }
   
   .topnav a {
