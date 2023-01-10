@@ -3,6 +3,7 @@ import os
 import datetime
 from zoneinfo import ZoneInfo
 import time
+import shutil
 
 server_timezone = "US/Eastern"
 
@@ -107,3 +108,12 @@ def update_task(pid, tid, new_statuscode, fil='tracker_files/db.json'):
 	
 	return
 
+def make_backups():
+	"""
+	1) Backup sqlite file
+	2) Convert sqlite to markdown doc
+	3) tracker json
+	4) list json
+	...
+	then, copy all above into ./backup and zip the file
+	"""

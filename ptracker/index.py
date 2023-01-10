@@ -1,5 +1,5 @@
 from sys import set_coroutine_origin_tracking_depth
-from flask import Flask, jsonify, escape, request, render_template, redirect, url_for
+from flask import Flask, jsonify, escape, request, render_template, redirect, url_for, send_file
 from flask_sqlalchemy import SQLAlchemy, model
 from sqlalchemy import func
 import json
@@ -510,3 +510,15 @@ def new_project():
 	utils.add_project(name)
 
 	return jsonify(returnval={})
+
+@app.route('/backup')
+def backup():
+	"""
+	Collect all relevant data files, copy into a directory, zip and upload to user
+	"""
+
+	utils.make_backups()
+	
+	return send_file()
+
+
