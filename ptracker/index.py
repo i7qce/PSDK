@@ -516,6 +516,11 @@ def backup():
 	"""
 	Collect all relevant data files, copy into a directory, zip and upload to user
 	"""
+	
+	if os.path.exists('./temp.md'):
+		os.remove('./temp.md')
+	
+	dump_db_to_md('./temp.md')
 
 	backup_dir_name = utils.make_backups()
 

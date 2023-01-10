@@ -124,5 +124,9 @@ def make_backups():
 	with zipfile.ZipFile(backup_dir_name, 'w', compression=zipfile.ZIP_DEFLATED) as zip:
 		zip.write('./tracker_files/db.json')
 		zip.write('./database.db')
+
+		if os.path.exists('./temp.md'):
+			zip.write('./temp.md')
+		
 	
 	return backup_dir_name
