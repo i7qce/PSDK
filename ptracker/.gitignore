@@ -9,5 +9,6 @@
 
 test*
 
+backups/
 not_used_databases/
 __pycache__/

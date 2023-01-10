@@ -517,8 +517,8 @@ def backup():
 	Collect all relevant data files, copy into a directory, zip and upload to user
 	"""
 
-	utils.make_backups()
-	
-	return send_file()
+	backup_dir_name = utils.make_backups()
+
+	return send_file(backup_dir_name)
 
 

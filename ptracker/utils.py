@@ -4,6 +4,7 @@ import datetime
 from zoneinfo import ZoneInfo
 import time
 import shutil
+import zipfile
 
 server_timezone = "US/Eastern"
 
@@ -117,3 +118,11 @@ def make_backups():
 	...
 	then, copy all above into ./backup and zip the file
 	"""
+
+	backup_dir_name = './backups/backup_' + str(time.time()).replace('.','_') +'.zip'
+
+	with zipfile.ZipFile(backup_dir_name, 'w', compression=zipfile.ZIP_DEFLATED) as zip:
+		zip.write('./tracker_files/db.json')
+		zip.write('./database.db')
+	
+	return backup_dir_name
