@@ -1,29 +1,24 @@
 #!/bin/sh
 
+sleep_val=.2
+
+press_and_release () {
+    xdotool key $1
+    sleep $sleep_val
+    xdotool keyup $1
+    sleep $sleep_val
+}
+
 xdotool keyup ctrl+shift+c
 
-sleep .2
+sleep $sleep_val
 
-xdotool key   ctrl+l ctrl+c
-sleep .2
-xdotool keyup ctrl+l ctrl+c
-
-sleep .2
-
-xdotool key   ctrl+alt+t
-sleep .2
-xdotool keyup ctrl+alt+t
-
-sleep .2
+press_and_release "ctrl+l ctrl+c"
+press_and_release "ctrl+alt+t"
 
 xdotool type "insert_w_tag ~/Documents/ff_clip.txt "
+sleep $sleep_val
 
-sleep .2
-
-xdotool key   ctrl+shift+v
-sleep .2
-xdotool keyup ctrl+shift+v
-
-sleep .2
+press_and_release "ctrl+shift+v"
 
 xdotool type " "
