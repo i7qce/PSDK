@@ -1,5 +1,12 @@
 #!/bin/sh
 
+# To use, add this script and insert_w_tag to /usr/local/bin/, and give all execution privilages. Then, under keyboard shortcuts, set the shortcut to run the command copy_url_ff:
+#
+# sudo cp copy_url_ff /usr/local/bin/copy_url_ff
+# sudo cp insert_w_tag /usr/local/bin/insert_w_tag
+# sudo chmod a+x /usr/local/bin/copy_url_ff /usr/local/bin/insert_w_tag
+
+
 sleep_val=.2
 
 press_and_release () {
@@ -10,7 +17,6 @@ press_and_release () {
 }
 
 xdotool keyup ctrl+shift+c
-
 sleep $sleep_val
 
 press_and_release "ctrl+l ctrl+c"
