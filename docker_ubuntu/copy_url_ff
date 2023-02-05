@@ -1,0 +1,29 @@
+#!/bin/sh
+
+xdotool keyup ctrl+shift+c
+
+sleep .2
+
+xdotool key   ctrl+l ctrl+c
+sleep .2
+xdotool keyup ctrl+l ctrl+c
+
+sleep .2
+
+xdotool key   ctrl+alt+t
+sleep .2
+xdotool keyup ctrl+alt+t
+
+sleep .2
+
+xdotool type "insert_w_tag ~/Documents/ff_clip.txt "
+
+sleep .2
+
+xdotool key   ctrl+shift+v
+sleep .2
+xdotool keyup ctrl+shift+v
+
+sleep .2
+
+xdotool type " "

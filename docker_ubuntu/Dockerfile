@@ -40,14 +40,18 @@ RUN apt-get install -y php
 
 RUN apt-get install -y libopencv-dev
 RUN apt-get install -y python3-pip
+RUN apt-get install -y python-is-python3
 
 RUN pip install numpy scipy matplotlib jupyterlab pandas scikit-learn opencv-python ipympl pillow jupyter tqdm pytest
 RUN pip install flask sqlalchemy flask-sqlalchemy flask-cors markdown lorem pymdown-extensions pygments mkdocs
 RUN pip install music21
+RUN pip install tensorflow
 
 RUN apt-get install -y sqlite3
 
 RUN apt-get install -y pandoc
+
+RUN apt-get install -y texlive-full
 
 # [Optional] Set the default user. Omit if you want to keep the default as root.
 USER $USERNAME
@@ -55,10 +59,17 @@ USER $USERNAME
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 
 RUN git config --global user.name "i7qce"
-RUN git config --global user.email "i7qce@dev-server.local"
+RUN git config --global user.email "111165003+i7qce@users.noreply.github.com"
 
 RUN ipython kernel install --user --name=dev_kernel
 
 WORKDIR "/home/i7qce/docs"
+
+# for pipenv
+RUN pip install pipenv
+RUN PATH=$PATH:/home/i7qce/.local/bin
+
+# On Ubuntu Jammy lTS, need python 3.11 for some things:
+RUN apt-get install -y python3.11
 
 CMD ["bash", "-l"]
