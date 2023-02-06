@@ -5,6 +5,13 @@
 # sudo cp copy_url_ff /usr/local/bin/copy_url_ff
 # sudo cp insert_w_tag /usr/local/bin/insert_w_tag
 # sudo chmod a+x /usr/local/bin/copy_url_ff /usr/local/bin/insert_w_tag
+#
+# also need to run 
+# sudo apt-get update
+# sudo apt-get install xdotool
+#
+# Then, go to keyboard shortcuts and enter a custom keybinding to the command copy_url_ff
+
 
 
 sleep_val=.2
