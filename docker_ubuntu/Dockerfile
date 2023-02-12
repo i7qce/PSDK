@@ -1,4 +1,7 @@
+# Select from below depending on whether you need GPU access or not- may need to udpate cuda version depending on 
+# GPU setup
 FROM ubuntu
+#FROM nvidia/cuda:11.7.0-runtime-ubuntu22.04
 
 ARG DEBIAN_FRONTEND=noninteractive
 
@@ -70,6 +73,6 @@ RUN pip install pipenv
 RUN PATH=$PATH:/home/i7qce/.local/bin
 
 # On Ubuntu Jammy lTS, need python 3.11 for some things:
-RUN apt-get install -y python3.11
+# RUN apt-get install -y python3.11
 
 CMD ["bash", "-l"]
