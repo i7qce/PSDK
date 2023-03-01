@@ -56,6 +56,8 @@ RUN apt-get install -y pandoc
 
 RUN apt-get install -y texlive-full
 
+RUN apt-get install -y git-filter-repo
+
 # [Optional] Set the default user. Omit if you want to keep the default as root.
 USER $USERNAME
 
