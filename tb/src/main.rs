@@ -1,5 +1,7 @@
 use std::path::PathBuf;
+
 use clap::Parser;
+use colored::*;
 
 #[derive(Parser)]
 struct Cli {
@@ -19,7 +21,7 @@ fn main() {
 
     for line in content.lines() {
         if line.contains(&args.pattern) {
-            println!("{}", line);
+            println!("{}", line.green().bold());
         }
     }
 
