@@ -11,6 +11,6 @@ test*
 
 backups/*
 !backups/
-!backups/.placeholder
+!**/.placeholder
 not_used_databases/
 __pycache__/
