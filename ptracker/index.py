@@ -14,7 +14,8 @@ app = Flask(__name__, static_url_path='/static')
 
 # DATABASE CONFIGURATION ####################################################
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
+basedir = os.path.abspath(os.path.dirname(__file__))
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'database.db') #'database.db'
 #app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///reorder.db'
 db = SQLAlchemy(app)
 

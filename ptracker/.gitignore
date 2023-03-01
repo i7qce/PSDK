@@ -9,6 +9,8 @@
 
 test*
 
-backups/
+backups/*
+!backups/
+!backups/.placeholder
 not_used_databases/
 __pycache__/
