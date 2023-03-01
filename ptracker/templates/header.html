@@ -1,0 +1,155 @@
+
+<!-- Load Roboto Font -->
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<!---<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@200&display=swap" rel="stylesheet"> --->
+<link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200;0,300;0,700;0,800;1,200;1,300;1,700;1,800&display=swap" rel="stylesheet">
+<!-- Font-Awesome Icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+
+<link rel="stylesheet" href="/static/styles_dm_blue.css">
+<link rel="stylesheet" href="/static/bs.css">
+<!-- <link rel="stylesheet" href="/static/md.css"> -->
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Latex Support -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [['$', '$'], ['\\(', '\\)']]
+        }
+    });
+</script>
+<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"></script>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+<!-- Checkbox behavior -->
+<script>
+    $(document).ready(function(){
+        $('input[type="checkbox"]').click(function(){
+            if($(this).prop("checked") == true){
+                console.log("Checkbox is checked.");
+            }
+            else if($(this).prop("checked") == false){
+                console.log("Checkbox is unchecked.");
+            }
+        });
+    });
+
+    //first simple solution, keep checkboxes unclickable and strikethrough checked ones (also called later in header when post request is made to update in-place)
+    $(document).ready(function(){
+        $(':checked').parent().css('text-decoration','line-through')
+    });
+    
+</script>
+
+<!-- Edit Box Behavior -->
+<script>
+    $(document).ready(function(){
+        $('.edit_toggle').click(function(){
+            if ($(this).parent().parent().nextAll('.displayed_content')[0].hasAttribute('hidden')) {
+                // if we are in edit mode, switch to display mode
+                
+                //display content
+                $(this).parent().parent().nextAll('.displayed_content')[0].removeAttribute('hidden');
+                $(this).parent().parent().nextAll('.edit_box')[0].setAttribute('hidden',1);
+
+                //display title
+                $(this).parent().prevAll('.edit_title').children()[0].setAttribute('hidden',1);
+                $(this).parent().prevAll('.displayed_title')[0].removeAttribute('hidden');
+
+                //hide save button
+                $(this).parent().nextAll()[0].setAttribute('hidden',1);
+
+                //hide trash button
+                $(this).parent().nextAll()[1].setAttribute('hidden',1);
+                
+            } else {
+                // if we are in display mode, switch to edit mode
+
+                //edit content
+                $(this).parent().parent().nextAll('.displayed_content')[0].setAttribute('hidden',1);
+                $(this).parent().parent().nextAll('.edit_box')[0].removeAttribute('hidden');
+
+                //edit title
+                $(this).parent().prevAll('.edit_title').children()[0].removeAttribute('hidden');
+                $(this).parent().prevAll('.displayed_title')[0].setAttribute('hidden',1);
+
+                //show save button
+                $(this).parent().nextAll()[0].removeAttribute('hidden');
+
+                //show trash button
+                $(this).parent().nextAll()[1].removeAttribute('hidden');
+            }
+        });
+    });
+
+    $(document).ready(function(){
+        $('.save_edits').click(function(){
+            var editingID = $(this).parent().parent()[0].id;
+            var newContent = $(this).parent().parent().nextAll('.edit_box')[0].value;
+
+            var newTitle = $(this).parent().prevAll('.edit_title').children()[0].value;
+
+            //alert(editingID);
+            //alert(newTitle);
+            //alert(newContent);
+
+            //cache $this for use in post
+            var $this = $(this);
+
+            $.post('/update_async', {id: editingID, content: newContent, title: newTitle}, function(response_from_server){
+                //alert(response_from_server.modified_title);
+                //alert(response_from_server.modified_content);
+                //alert(response_from_server.modified_content_html);
+
+
+                //update title in display box (editbox already changed)
+                $this.parent().prevAll('.displayed_title')[0].innerHTML = response_from_server.modified_title
+
+                //update contents in display box (editbox already changed)
+                $this.parent().parent().nextAll('.displayed_content')[0].innerHTML = response_from_server.modified_content_html
+
+
+                //switch to display mode (from above, slight mod to properly hide save button )
+                
+                //display content
+                $this.parent().parent().nextAll('.displayed_content')[0].removeAttribute('hidden');
+                $this.parent().parent().nextAll('.edit_box')[0].setAttribute('hidden',1);
+
+                //display title
+                $this.parent().prevAll('.edit_title').children()[0].setAttribute('hidden',1);
+                $this.parent().prevAll('.displayed_title')[0].removeAttribute('hidden');
+
+                //hide save button
+                $this.parent()[0].setAttribute('hidden',1);
+
+                //hide trash button
+                $this.parent().next()[0].setAttribute('hidden',1);
+
+                //redo typesetting
+                MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
+
+                //redo strikethroughs
+                $(':checked').parent().css('text-decoration','line-through')
+
+            } 
+            
+            );
+
+        });
+    });
+</script>
+
+<div class="topnav">
+    <a  href="/"> &nbsp;&nbsp;&nbsp;&nbsp;    <i class="fa fa-book"></i>&nbsp;&nbsp;&nbsp;&nbsp;  Personal Tracker</a>
+    <a href="/backup" style="float:right" download>Backup</a>
+    <a href="/lists" style="float:right">Lists</a>
+    <a href="/tracker" style="float:right">Project Tracker</a>
+    <a href="/" style="float:right">Wiki</a>
+    
+    
+</div>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+  {% include 'header.html' %}
+</head>
+
+
+<body>
+
+
+
+<div class="row">
+  <div class="column left">
+    <ul class="leftnav">
+    </ul>
+
+  </div>
+  <div class="column middle">
+
+
+
+
+
+
+
+
+
+
+
+  
+    <h1>Add Section</h1>
+    <hr />
+
+
+    <form action="" method="post">
+        <p>
+            <label for="title">Title</label>
+            <input type="text" autocomplete="off" name="title" required>
+        </p>
+
+        <label for="parent">If new section is subsection to existing, select parent:</label>
+
+        <select id="parent" name="parent">
+        <option value="None">Choose Section to Add Subsection to Parent</option>
+            {% for section in sections %}
+        <option value={{section.id}}>{{section.title}}</option>
+            {% endfor %}
+        </select>
+
+        <p>
+            <label for="sub_title">If new Section has multiple subsections, first subsection title</label>
+            <input type="text" autocomplete="off" name="sub_title">
+        </p>
+
+        <p>
+            <input type="submit">
+        </p>
+    </form>
+
+
+
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <div class="column right">
+    <ul class="leftnav">
+
+    </ul>
+  </div>
+</div>
+
+</body>
+</html>

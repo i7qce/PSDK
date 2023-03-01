@@ -1,0 +1,14 @@
+**.db
+**.sq3
+**.png
+**.DS_Store
+**.lock
+**.txt
+**.md
+**.json
+
+test*
+
+backups/
+not_used_databases/
+__pycache__/
