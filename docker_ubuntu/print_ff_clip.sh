@@ -15,6 +15,6 @@ tags=$(awk -F: '{print $1}' $1 | grep "\S" | tr '\n' ',' | tr -d ' ' | tr ',' '\
 for tag in $tags;
 do 
 echo $tag
-grep tag $1 | awk '{print "\t"$0}'
+grep --color=always $tag $1 | awk '{print "\t"$0}'
 echo ""
 done
