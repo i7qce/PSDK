@@ -15,6 +15,6 @@ tags=$(awk -F: '{print $1}' $1 | grep "\S" | tr '\n' ',' | tr -d ' ' | tr ',' '\
 for tag in $tags;
 do 
 echo -e "\x1b[4m\x1b[1m\x1b[32m"$tag"\x1b[0m"
-grep --color=always $tag $1 | awk -F: '{printf( "\t%-70s \n \t \x1b[2m \x1b[30m %s:%s \x1b[0m\n", $1, $2, $3);}'
+grep --color=auto $tag $1 | awk -F: '{printf( "\t%-70s \n \t \x1b[2m \x1b[30m %s:%s \x1b[0m\n", $1, $2, $3);}'
 echo ""
 done
