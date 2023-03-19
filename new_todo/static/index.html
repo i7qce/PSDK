@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
-<div id="app">
+<div id="app" v-cloak>
     <input type="text" v-model="filter" placeholder="Filter by title...">
     <select v-model="statusFilter">
         <option value="">Filter by status...</option>
@@ -50,11 +50,13 @@
             <span v-if="currentRow.completed">Completed at: {{ currentRow.completed }}</span><br>
             <label>Labels: <input type="text" v-model="currentRow.labels"></label><br>
             <label>Description:</label>
-            <textarea v-if="editingDescription" v-model="currentRow.description"></textarea>
-            <div v-else v-html="renderMarkdown(currentRow.description)"></div>
             <button @click="toggleEditingDescription">
                 {{ editingDescription ? 'View Markdown' : 'Edit Plaintext' }}
             </button>
+            <textarea v-if="editingDescription" v-model="currentRow.description"></textarea>
+            <div v-else class="markdown-container" v-html="renderMarkdown(currentRow.description)"></div>
+
+            
             <button @click="saveRow">Save</button>
             <button @click="cancelEdit">Cancel</button>
             <button @click="deleteRow(currentRow.id)">Delete</button>

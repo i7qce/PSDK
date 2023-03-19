@@ -18,7 +18,22 @@ def home():
     
     return Response(content, mimetype="text/html")
 
-	#return render_template('index.html')
+@app.route('/data.json')
+def tracker_json():
+
+	with open('./data.json', 'r') as f:
+		project_dict = json.load(f)
+	
+	return jsonify(project_dict)
+
+@app.route('/update', methods=['post'])
+def update_task():
+
+    content = request.get_json()
+    with open('./data.json', 'w') as f:
+        json.dump(content, f, indent=4)
+	
+    return jsonify(returnval={})
 
 # @app.route('/tracker')
 # def tracker():
