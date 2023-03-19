@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitHub Projects Table View</title>
+    <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+<div id="app">
+    <input type="text" v-model="filter" placeholder="Filter by title...">
+    <select v-model="statusFilter">
+        <option value="">Filter by status...</option>
+        <option v-for="status in statuses" :key="status">{{ status }}</option>
+    </select>
+    <input type="text" v-model="labelsFilter" placeholder="Filter by labels...">
+    <button @click="resetFilters">Reset Filters</button>
+    <table>
+        <thead>
+        <tr>
+            <th v-for="column in columns" :key="column">
+                {{ column }}
+                <button v-if="column === 'Created'" @click="toggleSort">Sort {{ sortDirection }}</button>
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr v-for="row in filteredAndSortedTableData" :key="row.id">
+            <td>{{ row.id }}</td>
+            <td @click="editRow(row)">{{ row.title }}</td>
+            <td>
+                <select v-model="row.status" @change="updateStatus(row)" :class="`status-${row.status.toLowerCase().replace(' ', '-')}`">
+                    <option v-for="status in statuses" :key="status">{{ status }}</option>
+                </select>
+            </td>
+            <td>{{ row.labels }}</td>
+            <td>{{ row.created }}</td>
+        </tr>
+        </tbody>
+    </table>
+    <button @click="addRow">Add Project</button>
+
+    <div class="modal" v-if="editing">
+        <div class="modal-content">
+            <h3>Edit/Add Project</h3>
+            <label>Title: <input type="text" v-model="currentRow.title"></label><br>
+            <label>Status: <select v-model="currentRow.status">
+                <option v-for="status in statuses" :key="status">{{ status }}</option>
+            </select></label>
+            <span v-if="currentRow.completed">Completed at: {{ currentRow.completed }}</span><br>
+            <label>Labels: <input type="text" v-model="currentRow.labels"></label><br>
+            <label>Description: <textarea v-model="currentRow.description"></textarea></label><br>
+            <button @click="saveRow">Save</button>
+            <button @click="cancelEdit">Cancel</button>
+            <button @click="deleteRow(currentRow.id)">Delete</button>
+        </div>
+    </div>
+</div>
+<script src="https://unpkg.com/vue@next"></script>
+<script src="./app.js"></script>
+</body>
+</html>
