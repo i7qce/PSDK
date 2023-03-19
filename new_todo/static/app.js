@@ -12,6 +12,7 @@ const app = Vue.createApp({
                 statusFilter: '',
                 labelsFilter: '',
                 editing: false,
+                editingDescription: true,
                 currentRow: {},
                 statuses: ['Open', 'In progress', 'Completed', 'Closed'],
                 sortDirection: 'asc',
@@ -37,6 +38,12 @@ const app = Vue.createApp({
                     this.filter = '';
                     this.statusFilter = '';
                     this.labelsFilter = '';
+                },
+                renderMarkdown(text) {
+                    return marked(text);
+                },
+                toggleEditingDescription() {
+                    this.editingDescription = !this.editingDescription;
                 },
                 editRow(row) {
                 this.editing = true;
