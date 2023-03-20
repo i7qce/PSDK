@@ -7,18 +7,31 @@
     <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
+
+
 <div id="app" v-cloak>
-    <input type="text" v-model="filter" placeholder="Filter by title...">
+    <div class="navbar">
+        <input type="text" v-model="filter" placeholder="Filter by title...">
+        <select v-model="statusFilter">
+            <option value="">Filter by status...</option>
+            <option v-for="status in statuses" :key="status">{{ status }}</option>
+        </select>
+        <input type="text" v-model="labelsFilter" placeholder="Filter by labels...">
+        <button @click="resetFilters">Reset Filters</button>
+        <button @click="addRow" style="float: right;">Add Project</button>
+    </div>
+    <!-- <input type="text" v-model="filter" placeholder="Filter by title...">
     <select v-model="statusFilter">
         <option value="">Filter by status...</option>
         <option v-for="status in statuses" :key="status">{{ status }}</option>
     </select>
     <input type="text" v-model="labelsFilter" placeholder="Filter by labels...">
     <button @click="resetFilters">Reset Filters</button>
+    <button @click="addRow">Add Project</button> -->
     <table>
         <thead>
         <tr>
-            <th v-for="column in columns" :key="column">
+            <th v-for="(column, index) in columns" :key="column" :class="`table-${column.toLowerCase()}`">
                 {{ column }}
                 <button v-if="column === 'Created'" @click="toggleSort">Sort {{ sortDirection }}</button>
             </th>
@@ -38,9 +51,9 @@
         </tr>
         </tbody>
     </table>
-    <button @click="addRow">Add Project</button>
+    
 
-    <div class="modal" v-if="editing">
+    <div class="modal" v-if="editing" @click.self="cancelEdit">
         <div class="modal-content">
             <h3>Edit/Add Project</h3>
             <label>Title: <input type="text" v-model="currentRow.title"></label><br>
@@ -66,9 +79,6 @@
 <script src="https://unpkg.com/vue@next"></script>
 <!-- <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script> -->
 <script src="https://cdn.jsdelivr.net/npm/marked@3.0.7/marked.min.js"></script>
-<script>
-    import { marked } from "marked";
-</script>
 <script src="./app.js"></script>
 </body>
 </html>
