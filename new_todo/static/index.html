@@ -1,84 +1,81 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GitHub Projects Table View</title>
+    <title>Project Tracker</title>
     <link rel="stylesheet" href="./styles.css">
 </head>
+
 <body>
 
 
-<div id="app" v-cloak>
-    <div class="navbar">
-        <input type="text" v-model="filter" placeholder="Filter by title...">
-        <select v-model="statusFilter">
-            <option value="">Filter by status...</option>
-            <option v-for="status in statuses" :key="status">{{ status }}</option>
-        </select>
-        <input type="text" v-model="labelsFilter" placeholder="Filter by labels...">
-        <button @click="resetFilters">Reset Filters</button>
-        <button @click="addRow" style="float: right;">Add Project</button>
-    </div>
-    <!-- <input type="text" v-model="filter" placeholder="Filter by title...">
-    <select v-model="statusFilter">
-        <option value="">Filter by status...</option>
-        <option v-for="status in statuses" :key="status">{{ status }}</option>
-    </select>
-    <input type="text" v-model="labelsFilter" placeholder="Filter by labels...">
-    <button @click="resetFilters">Reset Filters</button>
-    <button @click="addRow">Add Project</button> -->
-    <table>
-        <thead>
-        <tr>
-            <th v-for="(column, index) in columns" :key="column" :class="`table-${column.toLowerCase()}`">
-                {{ column }}
-                <button v-if="column === 'Created'" @click="toggleSort">Sort {{ sortDirection }}</button>
-            </th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr v-for="row in filteredAndSortedTableData" :key="row.id">
-            <td>{{ row.id }}</td>
-            <td @click="editRow(row)">{{ row.title }}</td>
-            <td>
-                <select v-model="row.status" @change="updateStatus(row)" :class="`status-${row.status.toLowerCase().replace(' ', '-')}`">
-                    <option v-for="status in statuses" :key="status">{{ status }}</option>
-                </select>
-            </td>
-            <td>{{ row.labels }}</td>
-            <td>{{ row.created }}</td>
-        </tr>
-        </tbody>
-    </table>
-    
+    <div id="app" v-cloak>
+        <div class="navbar">
 
-    <div class="modal" v-if="editing" @click.self="cancelEdit">
-        <div class="modal-content">
-            <h3>Edit/Add Project</h3>
-            <label>Title: <input type="text" v-model="currentRow.title"></label><br>
-            <label>Status: <select v-model="currentRow.status">
-                <option v-for="status in statuses" :key="status">{{ status }}</option>
-            </select></label>
-            <span v-if="currentRow.completed">Completed at: {{ currentRow.completed }}</span><br>
-            <label>Labels: <input type="text" v-model="currentRow.labels"></label><br>
-            <label>Description:</label>
-            <button @click="toggleEditingDescription">
-                {{ editingDescription ? 'View Markdown' : 'Edit Plaintext' }}
-            </button>
-            <textarea v-if="editingDescription" v-model="currentRow.description"></textarea>
-            <div v-else class="markdown-container" v-html="renderMarkdown(currentRow.description)"></div>
+            <button @click="resetFilters" style="float: right;">Reset Filters</button>
+            <button @click="addRow" style="float: right;">Add Project</button>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th v-for="(column, index) in columns" :key="column" :class="`table-${column.toLowerCase()}`">
+                        {{ column }}
+                        <input v-if="column === 'Title'" type="text" v-model="filter" placeholder="Filter by title...">
+                        <input v-if="column === 'Labels'" type="text" v-model="labelsFilter" placeholder="Filter by labels...">
+                        <select v-if="column === 'Status'" v-model="statusFilter">
+                            <option value="">Filter</option>
+                            <option v-for="status in statuses" :key="status">{{ status }}</option>
+                        </select>
+                        <button v-if="column === 'Created'" @click="toggleSort">Sort {{ sortDirection }}</button>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="row in filteredAndSortedTableData" :key="row.id">
+                    <td>{{ row.id }}</td>
+                    <td @click="editRow(row)">{{ row.title }}</td>
+                    <td>
+                        <select v-model="row.status" @change="updateStatus(row)"
+                            :class="`status-${row.status.toLowerCase().replace(' ', '-')}`">
+                            <option v-for="status in statuses" :key="status">{{ status }}</option>
+                        </select>
+                    </td>
+                    <td>{{ row.labels }}</td>
+                    <td>{{ formatDate(row.created) }}</td>
+                </tr>
+            </tbody>
+        </table>
 
-            
-            <button @click="saveRow">Save</button>
-            <button @click="cancelEdit">Cancel</button>
-            <button @click="deleteRow(currentRow.id)">Delete</button>
+
+        <div class="modal" v-if="editing" @click.self="cancelEdit">
+            <div class="modal-content">
+                <h3>Edit/Add Project</h3>
+                <label>Title: <input type="text" v-model="currentRow.title"></label><br>
+                <label>Status: <select v-model="currentRow.status">
+                        <option v-for="status in statuses" :key="status">{{ status }}</option>
+                    </select></label>
+                <span v-if="currentRow.completed">Completed at: {{ formatDate(currentRow.completed) }}</span><br>
+                <label>Labels: <input type="text" v-model="currentRow.labels"></label><br>
+                <label>Description:</label>
+                <button @click="toggleEditingDescription">
+                    {{ editingDescription ? 'View Markdown' : 'Edit Plaintext' }}
+                </button>
+                <textarea v-if="editingDescription" v-model="currentRow.description"></textarea>
+                <div v-else class="markdown-container" v-html="renderMarkdown(currentRow.description)"></div>
+
+
+                <button @click="saveRow">Save</button>
+                <button @click="cancelEdit">Cancel</button>
+                <button @click="deleteRow(currentRow.id)">Delete</button>
+            </div>
         </div>
     </div>
-</div>
-<script src="https://unpkg.com/vue@next"></script>
-<!-- <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script> -->
-<script src="https://cdn.jsdelivr.net/npm/marked@3.0.7/marked.min.js"></script>
-<script src="./app.js"></script>
+    <script src="https://unpkg.com/vue@next"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/marked@3.0.7/marked.min.js"></script>
+    <script src="./app.js"></script>
 </body>
+
 </html>
