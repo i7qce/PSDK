@@ -14,6 +14,25 @@ async function sendData(data) {
   });
 }
 
+// New marked.js renderer to add class to ul for task-list
+const renderer = new marked.Renderer();
+const defaultListRenderer = renderer.list;
+
+renderer.list = function(body, ordered, start) {
+  // If there's input elements in body, add task list class
+  if (body.includes('<input')){
+    var temp = "<ul class='task-list'>" + body + "</ul>";
+    return temp;
+  }
+  // else, use default list renderer for ordered lists, unordered lists, etc.
+  return defaultListRenderer.call(this, body, ordered, start);
+};
+
+// Set the custom renderer as the renderer for marked
+marked.setOptions({
+  renderer: renderer,
+});
+
 const app = Vue.createApp({
   data() {
     return {
@@ -56,7 +75,11 @@ const app = Vue.createApp({
       this.labelsFilter = '';
     },
     renderMarkdown(text) {
-      return marked(text);
+      // regex to wrap all task-list text in a span
+      const regex_add_span_to_task_item = /(<li>\s*<input[^>]*>)([^<]*)(<\/li>)/g;
+      // regex to make check boxes not disabled
+      const regex_remove_disabled_from_checkbox = /(<input[^>]*)\s*disabled([^>]*>)/g;
+      return marked(text).replace(regex_add_span_to_task_item, '$1<span>$2</span>$3').replace(regex_remove_disabled_from_checkbox, '$1$2');
     },
     toggleEditingDescription() {
       this.editingDescription = !this.editingDescription;

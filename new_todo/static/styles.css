@@ -157,3 +157,29 @@ textarea {
   background-color: green;
   color: white;
 }
+
+
+
+.task-list {
+  list-style-type: none;
+  padding-left: 20px;
+}
+
+.task-list li {
+  /* padding-left: 10px; */
+}
+
+
+
+
+input[type=checkbox]:not(:checked) + span {
+  color: var(--main_txt_color);
+}
+
+input[type=checkbox]:checked  {
+  accent-color: rgb(54, 191, 77);
+}
+
+input[type=checkbox]:checked + span {
+  color: rgb(77, 77, 77);
+}

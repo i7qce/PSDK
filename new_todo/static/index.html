@@ -60,11 +60,13 @@
                 <span v-if="currentRow.completed">Completed at: {{ formatDate(currentRow.completed) }}</span><br>
                 <label>Labels: <input type="text" v-model="currentRow.labels"></label><br>
                 <label>Description:</label>
+
                 <button @click="toggleEditingDescription">
                     {{ editingDescription ? 'View Markdown' : 'Edit Plaintext' }}
                 </button>
+
                 <textarea v-if="editingDescription" v-model="currentRow.description"></textarea>
-                <div v-else class="markdown-container" v-html="renderMarkdown(currentRow.description)"></div>
+                <div v-else class="markdown-container" v-html="renderMarkdown(currentRow.description)" @click="toggleEditingDescription"></div>
 
 
                 <button @click="saveRow">Save</button>
