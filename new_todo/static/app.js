@@ -82,9 +82,13 @@ const app = Vue.createApp({
       } else {
         this.currentRow.completed = null;
       }
+      
+      // reset to markdown view
+      this.editingDescription = false;
 
-      this.editing = false;
-      this.currentRow = {};
+      // Don't close after saving
+      //this.editing = false;
+      //this.currentRow = {};
 
       await sendData(this.tableData);
     },
@@ -105,15 +109,19 @@ const app = Vue.createApp({
       return new Intl.DateTimeFormat('en-US', options).format(date);
     },
     async deleteRow(id) {
-      this.tableData = this.tableData.filter(row => row.id !== id);
-      this.editing = false;
-      this.currentRow = {};
+
+      if (confirm('Delete this task?')) {
+        this.tableData = this.tableData.filter(row => row.id !== id);
+        this.editing = false;
+        this.currentRow = {};
+      }
 
       await sendData(this.tableData);
     },
     cancelEdit() {
       this.editing = false;
       this.currentRow = {};
+      this.editingDescription = false;
     },
     async updateStatus(row) {
       if (row.status === 'Completed' || row.status === 'Closed') {

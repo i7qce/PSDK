@@ -14,16 +14,17 @@
     <div id="app" v-cloak>
         <div class="navbar">
 
-            <button @click="resetFilters" style="float: right;">Reset Filters</button>
-            <button @click="addRow" style="float: right;">Add Project</button>
         </div>
         <table>
             <thead>
                 <tr>
                     <th v-for="(column, index) in columns" :key="column" :class="`table-${column.toLowerCase()}`">
                         {{ column }}
+                        <button v-if="column === 'ID'" @click="addRow">+</button>
                         <input v-if="column === 'Title'" type="text" v-model="filter" placeholder="Filter by title...">
-                        <input v-if="column === 'Labels'" type="text" v-model="labelsFilter" placeholder="Filter by labels...">
+                        <button v-if="column === 'Title'" @click="resetFilters">Reset Filters</button>
+                        <input v-if="column === 'Labels'" type="text" v-model="labelsFilter"
+                            placeholder="Filter by labels...">
                         <select v-if="column === 'Status'" v-model="statusFilter">
                             <option value="">Filter</option>
                             <option v-for="status in statuses" :key="status">{{ status }}</option>
