@@ -5,41 +5,71 @@
   --main_txt_color: rgb(160, 162, 167);
   --link_color: rgb(122, 232, 255); 
 
+  --radius: 4px;
+
   --navbar_color: var(--main_bg_color);
-  --navbar_bottom_borde_color: rgba(42, 42, 42, 0.624);
+  --navbar_bottom_border_color: rgba(42, 42, 42, 0.624);
+  --navbar_txt_color: #f2f2f2;
 
   --tablebar_color: rgb(0, 69, 144);
+  --tablebar_txt_color: var(--main_txt_color);
   --table_border_color: #ccc;
 
   --checked_txt_color: rgb(77, 77, 77);
   --checked_checkbox_color: rgb(54, 191, 77);
+
+  --fontweight: 300;
 }
 
 [data-theme="light"] {
 
-  --main_bg_color: rgb(205, 205, 205); 
-  --main_txt_color: rgb(25, 25, 25);
-  --link_color: rgb(122, 232, 255); 
+  --main_bg_color: rgb(238, 238, 238); 
+  --main_txt_color: rgb(41, 41, 41);
+  --link_color: rgb(0, 186, 223); 
+
+  --radius: 4px;
+
+  --navbar_color: rgb(0, 36, 75);
+  --navbar_bottom_border_color: rgba(42, 42, 42, 0.624);
+  --navbar_txt_color: #cacaca;
+
+  --tablebar_color: rgb(43, 121, 205);
+  --tablebar_txt_color: white;
+  --table_border_color: #a8a8a8;
+
+  --checked_txt_color: rgb(142, 142, 142);
+  --checked_checkbox_color: rgb(54, 191, 77);
+
+  --fontweight: 400;
+}
+
+[data-theme="virustotal"] {
+  
+  --main_bg_color: rgb(40	46	62); 
+  --main_txt_color: rgb(255	255	255);
+  --link_color: rgb(141	169	243); 
+
+  --radius: 4px;
 
   --navbar_color: var(--main_bg_color);
+  --navbar_bottom_border_color: rgba(227, 227, 227, 0.624);
+  --navbar_txt_color: var(--main_txt_color);
 
-  --tablebar_color: rgb(0, 69, 144);
-  --table_border_color: #2e2e2e;
+  --tablebar_color: rgb(51	58	76);
+  --tablebar_txt_color: var(--main_txt_color);
+  --table_border_color: rgba(255,255,255,0.15);
 
   --checked_txt_color: rgb(77, 77, 77);
   --checked_checkbox_color: rgb(54, 191, 77);
 
-}
-
-[data-theme="virustotal"] {
-
+  --fontweight: 300;
 }
 
 /* #region Main HTML Sections*/
 
 body {
   font-family: 'Roboto', 'nunito', Arial, sans-serif;
-  font-weight: 300;
+  font-weight: var(--fontweight);
   margin: 0;
   padding: 0;
   background-color: var(--main_bg_color);
@@ -55,19 +85,61 @@ table {
   margin-left: auto;
   margin-right: auto;
   margin-top: 80px;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
 }
 
 th,
 td {
-  border: 1px solid var(--table_border_color);
   padding: 8px;
   text-align: left;
 }
 
 th {
   background-color: var(--tablebar_color);
+  color: var(--tablebar_txt_color);
 }
+
+
+/* Below is required for rounding corners on main table, without double-wide border inside the table due
+to border-collapse: collapse and border-radius > 0px not being compatible
+*/
+
+table tr th,
+table tr td {
+  border-right: 1px solid var(--table_border_color);
+  border-bottom: 1px solid var(--table_border_color);
+}
+
+table tr th:first-child,
+table tr td:first-child {
+  border-left: 1px solid var(--table_border_color);
+}
+table tr th {
+  text-align: left;
+  border-top: solid 1px var(--table_border_color);
+}
+
+/* top-left border-radius */
+table tr:first-child th:first-child {
+  border-top-left-radius: var(--radius);
+}
+
+/* top-right border-radius */
+table tr:first-child th:last-child {
+  border-top-right-radius: var(--radius);
+}
+
+/* bottom-left border-radius */
+table tr:last-child td:first-child {
+  border-bottom-left-radius: var(--radius);
+}
+
+/* bottom-right border-radius */
+table tr:last-child td:last-child {
+  border-bottom-right-radius: var(--radius);
+}
+
 
 
 /* #endregion */
@@ -85,14 +157,14 @@ th {
   width: 100%;
   /* Full width */
   height: 50px;
-  border-bottom: 1px solid var(--navbar_bottom_borde_color);
+  border-bottom: 1px solid var(--navbar_bottom_border_color);
 }
 
 /* Links inside the navbar */
 .navbar a {
   float: left;
   display: block;
-  color: #f2f2f2;
+  color: var(--navbar_txt_color);
   text-align: center;
   padding: 14px 16px;
   text-decoration: none;
@@ -101,8 +173,7 @@ th {
 
 /* Change background on mouse-over */
 .navbar a:hover {
-  background: #ddd;
-  color: black;
+  filter: brightness(50%);
 }
 
 /* #endregion */
