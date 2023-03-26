@@ -10,11 +10,18 @@
 
 <body>
 
+    <div class="navbar">
+        <a  href="/"> &nbsp;&nbsp;&nbsp;&nbsp;    <i class="fa fa-book"></i>&nbsp;&nbsp;&nbsp;&nbsp;  Personal Tracker</a>
+        <a href="/backup" style="float:right" download>Backup</a>
+        <a href="/lists" style="float:right">Lists</a>
+        <a href="/tracker" style="float:right">Project Tracker</a>
+        <a href="/" style="float:right">Wiki</a>
+        
+        
+    </div>
 
     <div id="app" v-cloak>
-        <div class="navbar">
 
-        </div>
         <table>
             <thead>
                 <tr>
@@ -75,9 +82,33 @@
             </div>
         </div>
     </div>
+
+    <select class="theme_select" style="position: fixed; bottom: 15px; right: 15px;" onchange="document.documentElement.setAttribute('data-theme', event.target.value);"> 
+        <option value="dark">Dark Mode</option> 
+        <option value="light">Light Mode</option> 
+        <option value="virustotal">Virus Total</option> 
+    </select> 
+
+
     <script src="https://unpkg.com/vue@next"></script>
     <!-- <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script> -->
     <script src="https://cdn.jsdelivr.net/npm/marked@3.0.7/marked.min.js"></script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+            tex2jax: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            }
+        });
+    </script>
+    <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <!---<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@200&display=swap" rel="stylesheet"> --->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200;0,300;0,700;0,800;1,200;1,300;1,700;1,800&display=swap" rel="stylesheet">
+    <!-- Font-Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
     <script src="./app.js"></script>
 </body>
 

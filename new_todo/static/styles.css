@@ -1,17 +1,47 @@
+/* Theming */
+
 :root {
   --main_bg_color: rgb(16,22,29); 
-  --accent_color: rgb(90, 150, 215);
-  --quote_background: rgb(22, 30, 38); 
-  --tablebar: rgb(0, 69, 144);
-
+  --main_txt_color: rgb(160, 162, 167);
   --link_color: rgb(122, 232, 255); 
-  --main_txt_color: rgb(160, 162, 167); /* rgb(238, 238, 238); */
 
-  --menu_txt_color: rgb(90, 150, 215);/*rgb(113, 97, 137); */
-  --button_color: rgba(199, 199, 199, 0.199); 
+  --navbar_color: var(--main_bg_color);
+  --navbar_bottom_borde_color: rgba(42, 42, 42, 0.624);
+
+  --tablebar_color: rgb(0, 69, 144);
+  --table_border_color: #ccc;
+
+  --checked_txt_color: rgb(77, 77, 77);
+  --checked_checkbox_color: rgb(54, 191, 77);
 }
 
+[data-theme="light"] {
+
+  --main_bg_color: rgb(205, 205, 205); 
+  --main_txt_color: rgb(25, 25, 25);
+  --link_color: rgb(122, 232, 255); 
+
+  --navbar_color: var(--main_bg_color);
+
+  --tablebar_color: rgb(0, 69, 144);
+  --table_border_color: #2e2e2e;
+
+  --checked_txt_color: rgb(77, 77, 77);
+  --checked_checkbox_color: rgb(54, 191, 77);
+
+}
+
+[data-theme="virustotal"] {
+
+}
+
+/* #region Main HTML Sections*/
+
 body {
+  font-family: 'Roboto', 'nunito', Arial, sans-serif;
+  font-weight: 300;
+  margin: 0;
+  padding: 0;
   background-color: var(--main_bg_color);
   color: var(--main_txt_color);
 }
@@ -20,17 +50,42 @@ a {
   color: var(--link_color);
 }
 
+table {
+  width: 75%;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 80px;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  border: 1px solid var(--table_border_color);
+  padding: 8px;
+  text-align: left;
+}
+
+th {
+  background-color: var(--tablebar_color);
+}
+
+
+/* #endregion */
+
+/* #region App Specific*/
+
 /* The navigation bar */
 .navbar {
   overflow: hidden;
-  background-color: var(--main_bg_color);
+  background-color: var(--navbar_color);
   position: fixed;
   /* Set the navbar to fixed position */
   top: 0;
   /* Position the navbar at the top of the page */
   width: 100%;
   /* Full width */
-  height: 30px;
+  height: 50px;
+  border-bottom: 1px solid var(--navbar_bottom_borde_color);
 }
 
 /* Links inside the navbar */
@@ -41,6 +96,7 @@ a {
   text-align: center;
   padding: 14px 16px;
   text-decoration: none;
+  font-size: 17px;
 }
 
 /* Change background on mouse-over */
@@ -49,31 +105,9 @@ a {
   color: black;
 }
 
-body {
-  font-family: Arial, sans-serif;
-  margin: 0;
-  padding: 0;
-}
+/* #endregion */
 
-table {
-  width: 75%;
-  margin-left: auto;
-  margin-right: auto;
-  margin-top: 50px;
-  border-collapse: collapse;
-}
 
-th,
-td {
-  border: 1px solid #ccc;
-  padding: 8px;
-  text-align: left;
-}
-
-th {
-  background-color: var(--tablebar);
-  /* background-color: #f4f4f4; */
-}
 
 
 [v-cloak]>* {
@@ -140,7 +174,7 @@ textarea {
   width: 10%;
 }
 
-
+/* Status Elements */
 
 .status-open {
   background-color: grey;
@@ -165,21 +199,16 @@ textarea {
   padding-left: 20px;
 }
 
-.task-list li {
-  /* padding-left: 10px; */
-}
-
-
-
+/* Checkboxes */
 
 input[type=checkbox]:not(:checked) + span {
   color: var(--main_txt_color);
 }
 
 input[type=checkbox]:checked  {
-  accent-color: rgb(54, 191, 77);
+  accent-color: var(--checked_checkbox_color);
 }
 
 input[type=checkbox]:checked + span {
-  color: rgb(77, 77, 77);
+  color: var(--checked_txt_color);
 }

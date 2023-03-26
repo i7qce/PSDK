@@ -1,5 +1,5 @@
 from sys import set_coroutine_origin_tracking_depth
-from flask import Flask, jsonify, escape, request, render_template, redirect, url_for, Response
+from flask import Flask, jsonify, escape, request, render_template, redirect, url_for, Response, send_file
 import json
 import os
 
@@ -34,6 +34,14 @@ def update_task():
         json.dump(content, f, indent=4)
 	
     return jsonify(returnval={})
+
+@app.route('/backup')
+def backup():
+	"""
+	Collect all relevant data files, copy into a directory, zip and upload to user
+	"""
+
+	return send_file('./data.json')
 
 # @app.route('/tracker')
 # def tracker():
