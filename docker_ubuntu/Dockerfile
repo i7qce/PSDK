@@ -50,6 +50,12 @@ RUN pip install flask sqlalchemy flask-sqlalchemy flask-cors markdown lorem pymd
 RUN pip install music21
 RUN pip install tensorflow
 
+# IF CPU:
+pip3 install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cpu
+
+# IF GPU:
+
+
 RUN apt-get install -y sqlite3
 
 RUN apt-get install -y pandoc
