@@ -1,4 +1,5 @@
 import json
+import time
 
 import matplotlib.pyplot as plt
 
@@ -20,17 +21,20 @@ class StableDiffusionKerasCV(GenerativeModelRunner):
 
     def run(self, params):
 
-        batch_size = params['batch_size']
+        batch_size = int(params['batch_size'])
         runs = params['runs']
-        for _ in runs:
+        for _ in range(runs):
             images = self.model.text_to_image(params['prompt'], batch_size=batch_size)
             for i in range(len(images)):
                 plt.imshow(images[i])
-
-                plt.savefig(prep_results_dir(params['results_directory']) + '_' + params['prompt'].replace(" ", "_")[:50] + '.png')
                 
-                with open(prep_results_dir(params['results_directory']) + '_params.json', 'w') as f:
-                    json.dump(params, f)
+                file_header = prep_results_dir(params['results_directory'])
+
+                plt.savefig(file_header + '_' + params['prompt'].replace(" ", "_")[:50] + '.png')
+                
+                with open(file_header + '_params.json', 'w') as f:
+                    json.dump(params, f, indent=4)
+                time.sleep(3)
 
 
 

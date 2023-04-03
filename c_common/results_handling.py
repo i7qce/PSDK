@@ -15,6 +15,9 @@ def prep_results_dir(results_directory):
 
     path_to_write_to = os.path.join(results_directory, current_date)
     
+    if not os.path.isdir(results_directory):
+        os.makedirs(results_directory)
+
     if not os.path.isdir(path_to_write_to):
         os.makedirs(path_to_write_to)
     
