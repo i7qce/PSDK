@@ -14,14 +14,23 @@ def TextToImageFactory(model):
     return models[model]
 
 if __name__ == "__main__":
-    
+   
+    if len(sys.argv) > 1:
+        prompt = sys.argv[1]
+    else:
+        prompt = "prompt here"
+
+    print(f'Prompt being generated is {prompt}')
+
     params = {
         "resolution": 512,
         "batch_size": 3,
-        "runs": 1,
+        "runs": 2,
         "results_directory": "/home/i7qce/docs/generated_images2",
         "model": 'stablediffusionkeras',
-        "prompt": "High resolution photo of a Pineapple",
+        "prompt": prompt,
+        "negative_prompt": None,
+        "CFG": 7.5,
     }
 
     Generator = TextToImageFactory(params['model'])(params)
