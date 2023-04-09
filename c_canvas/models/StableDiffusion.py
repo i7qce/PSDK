@@ -24,7 +24,14 @@ class StableDiffusionKerasCV(GenerativeModelRunner):
         batch_size = int(params['batch_size'])
         runs = params['runs']
         for _ in range(runs):
-            images = self.model.text_to_image(params['prompt'], batch_size=batch_size)
+
+            images = self.model.text_to_image(
+                prompt=params['prompt'],
+                negative_prompt= params['negative_prompt'],
+                batch_size=batch_size,
+                unconditional_guidance_scale=params['CFG'],
+                )
+
             for i in range(len(images)):
                 plt.imshow(images[i])
                 
