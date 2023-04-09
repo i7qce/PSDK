@@ -49,9 +49,31 @@ RUN pip install numpy scipy matplotlib jupyterlab pandas scikit-learn opencv-pyt
 RUN pip install flask sqlalchemy flask-sqlalchemy flask-cors markdown lorem pymdown-extensions pygments mkdocs
 RUN pip install music21
 RUN pip install tensorflow
+# caps needed for cython
+RUN pip install Cython
 
 # IF CPU:
 pip3 install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cpu
+#
+#
+# pip install --upgrade "jax[cpu]"
+#
+#
+# To install jax, did the following:
+# For ARM linux on docker in M1 mac, can't install from pip since a pre-built jaxlib isn't provided. Instead need to build from source
+#
+# Needed to increase docker ram from 7.9 GB to 13 GB, otherwise it crashed when compiling during build
+#
+# Needed to run the pip install dist/*whl command (the one suggested in the terminal output on completion of build). Then I ran python setup.py install --user in the jax/ directory, don't think that was necessary, just trying things out to get it to work
+#
+# After successfully building/setting up, importing only worked when inside the jax/ source directory
+#
+# Previously had an old version of jax that was causing the error- installed jax from pip w/ pip uninstall to remove the old one, and copied the jax/ directory that was in a version-specific jax*.egg directory inside site-packages into site-packages itself
+#
+# At this point, importing/pip can see it and it seems to work.
+
+
+
 
 # IF GPU:
 
