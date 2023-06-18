@@ -73,6 +73,9 @@ pip3 install torch torchvision torchaudio --extra-index-url https://download.pyt
 # At this point, importing/pip can see it and it seems to work.
 
 
+RUN apt-get install musescore
+# music21 searches for an executable called /usr/bin/mscore3, so create a symlink which points at /usr/bin/mscore which is installed in above command
+RUN ln -s /usr/bin/mscore /usr/bin/mscore3
 
 
 # IF GPU:
