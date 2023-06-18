@@ -4,3 +4,4 @@
 *.lock
 **/temp/
 *.png
+data.json

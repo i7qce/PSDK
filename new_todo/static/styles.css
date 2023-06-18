@@ -1,6 +1,28 @@
 /* Theming */
 
 :root {
+  --main_bg_color: rgb(40	46	62); 
+  --main_txt_color: rgb(255	255	255);
+  --link_color: rgb(141	169	243); 
+
+  --radius: 4px;
+
+  --navbar_color: var(--main_bg_color);
+  --navbar_bottom_border_color: rgba(227, 227, 227, 0.624);
+  --navbar_txt_color: var(--main_txt_color);
+
+  --tablebar_color: rgb(51	58	76);
+  --tablebar_txt_color: var(--main_txt_color);
+  --table_border_color: rgba(255,255,255,0.15);
+
+  --checked_txt_color: rgb(77, 77, 77);
+  --checked_checkbox_color: rgb(54, 191, 77);
+
+  --fontweight: 300;
+}
+
+[data-theme="dark"] {
+
   --main_bg_color: rgb(16,22,29); 
   --main_txt_color: rgb(160, 162, 167);
   --link_color: rgb(122, 232, 255); 

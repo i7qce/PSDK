@@ -29,7 +29,7 @@
                         {{ column }}
                         <button v-if="column === 'ID'" @click="addRow">+</button>
                         <input v-if="column === 'Title'" type="text" v-model="filter" placeholder="Filter by title...">
-                        <button v-if="column === 'Title'" @click="resetFilters">Reset Filters</button>
+                        <button v-if="column === 'Title'" @click="resetFilters" style="float: right">Reset Filters</button>
                         <input v-if="column === 'Labels'" type="text" v-model="labelsFilter"
                             placeholder="Filter by labels...">
                         <select v-if="column === 'Status'" v-model="statusFilter">
@@ -84,9 +84,9 @@
     </div>
 
     <select class="theme_select" style="position: fixed; bottom: 15px; right: 15px;" onchange="document.documentElement.setAttribute('data-theme', event.target.value);"> 
+        <option value="virustotal">Virus Total</option> 
         <option value="dark">Dark Mode</option> 
         <option value="light">Light Mode</option> 
-        <option value="virustotal">Virus Total</option> 
         <option value="ft">Financial Times</option> 
     </select> 
 
