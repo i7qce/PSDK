@@ -49,6 +49,7 @@ RUN pip install numpy scipy matplotlib jupyterlab pandas scikit-learn opencv-pyt
 RUN pip install flask sqlalchemy flask-sqlalchemy flask-cors markdown lorem pymdown-extensions pygments mkdocs
 RUN pip install music21
 RUN pip install tensorflow
+RUN pip install black
 # caps needed for cython
 RUN pip install Cython
 
