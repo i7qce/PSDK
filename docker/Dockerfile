@@ -28,30 +28,16 @@ RUN groupadd --gid $USER_GID $USERNAME \
 # ********************************************************
 
 RUN yes | unminimize
-
 RUN apt-get install -y ubuntu-standard
-
 RUN apt-get update
 
-RUN apt-get install -y vim
-RUN apt-get install -y tmux
-RUN apt-get install -y git
-RUN apt-get install -y curl
-RUN apt-get install -y lilypond
+#RUN apt-get install -y vim
 
-RUN apt-get install -y php
 
-RUN apt-get install -y libopencv-dev
-RUN apt-get install -y python3-pip
-RUN apt-get install -y python-is-python3
+# Install all system level packages
 
-RUN pip install numpy scipy matplotlib jupyterlab pandas scikit-learn opencv-python ipympl pillow jupyter tqdm pytest
-RUN pip install flask sqlalchemy flask-sqlalchemy flask-cors markdown lorem pymdown-extensions pygments mkdocs
-RUN pip install music21
-RUN pip install tensorflow
-RUN pip install black
-# caps needed for cython
-RUN pip install Cython
+
+
 
 # IF CPU:
 pip3 install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cpu
@@ -82,13 +68,7 @@ RUN ln -s /usr/bin/mscore /usr/bin/mscore3
 # IF GPU:
 
 
-RUN apt-get install -y sqlite3
 
-RUN apt-get install -y pandoc
-
-RUN apt-get install -y texlive-full
-
-RUN apt-get install -y git-filter-repo
 
 # [Optional] Set the default user. Omit if you want to keep the default as root.
 USER $USERNAME

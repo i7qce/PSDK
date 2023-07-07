@@ -1,0 +1,14 @@
+vim
+tmux
+git
+curl
+lilypond
+php
+libopencv-dev
+python3-pip
+python-is-python3
+sqlite3
+pandoc
+texlive-full
+git-filter-repo
+musescore
