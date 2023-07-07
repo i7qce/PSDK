@@ -4,4 +4,13 @@
 *.lock
 **/temp/
 *.png
+
+# From lilypond
+*.eps
+*.texi
+*.tex
+*.pdf
+*.count
+*.mid
+
 data.json
