@@ -1,3 +1,4 @@
+# For this to work, please ensure the terminal is inside the PSDK/docker/ directory when running
 # Select from below depending on whether you need GPU access or not- may need to udpate cuda version depending on 
 # GPU setup
 FROM ubuntu
@@ -31,62 +32,40 @@ RUN yes | unminimize
 RUN apt-get install -y ubuntu-standard
 RUN apt-get update
 
-#RUN apt-get install -y vim
-
+# Copy all env files into the container
+COPY env_files/ /opt/env_files
 
 # Install all system level packages
+RUN xargs sudo apt-get install -y /opt/env_files/reqs_system.txt
+
+# Install all python packages
+RUN pip install -r /opt/env_files/reqs_python.txt
 
 
 
+# music21 searches for an executable called /usr/bin/mscore3, so create a symlink which points at /usr/bin/mscore which is installed in above command
+RUN ln -s /usr/bin/mscore /usr/bin/mscore3
+# for pipenv
+RUN PATH=$PATH:/home/i7qce/.local/bin
+# Setup dev_kernel
+RUN ipython kernel install --user --name=dev_kernel
 
 # IF CPU:
 pip3 install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cpu
-#
-#
-# pip install --upgrade "jax[cpu]"
-#
-#
-# To install jax, did the following:
-# For ARM linux on docker in M1 mac, can't install from pip since a pre-built jaxlib isn't provided. Instead need to build from source
-#
-# Needed to increase docker ram from 7.9 GB to 13 GB, otherwise it crashed when compiling during build
-#
-# Needed to run the pip install dist/*whl command (the one suggested in the terminal output on completion of build). Then I ran python setup.py install --user in the jax/ directory, don't think that was necessary, just trying things out to get it to work
-#
-# After successfully building/setting up, importing only worked when inside the jax/ source directory
-#
-# Previously had an old version of jax that was causing the error- installed jax from pip w/ pip uninstall to remove the old one, and copied the jax/ directory that was in a version-specific jax*.egg directory inside site-packages into site-packages itself
-#
-# At this point, importing/pip can see it and it seems to work.
-
-
-RUN apt-get install musescore
-# music21 searches for an executable called /usr/bin/mscore3, so create a symlink which points at /usr/bin/mscore which is installed in above command
-RUN ln -s /usr/bin/mscore /usr/bin/mscore3
-
 
 # IF GPU:
-
-
 
 
 # [Optional] Set the default user. Omit if you want to keep the default as root.
 USER $USERNAME
 
+# Install rust
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 
+# Configure git
 RUN git config --global user.name "i7qce"
 RUN git config --global user.email "111165003+i7qce@users.noreply.github.com"
 
-RUN ipython kernel install --user --name=dev_kernel
-
 WORKDIR "/home/i7qce/docs"
-
-# for pipenv
-RUN pip install pipenv
-RUN PATH=$PATH:/home/i7qce/.local/bin
-
-# On Ubuntu Jammy lTS, need python 3.11 for some things:
-# RUN apt-get install -y python3.11
 
 CMD ["bash", "-l"]

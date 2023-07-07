@@ -12,3 +12,4 @@ pandoc
 texlive-full
 git-filter-repo
 musescore
+python3.11

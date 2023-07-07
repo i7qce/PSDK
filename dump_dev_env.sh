@@ -29,11 +29,11 @@ echo "Copying $host_target_dir/dump_dev_env.sh to $container_id:$container_targe
 docker cp $host_target_dir/dump_dev_env.sh $container_id:$container_target_dir/dump_dev_env.sh
 
 # Also, copy the dockerfile + scripts to build image and run container into outer directory
-echo "Copying Dockerfile, create_image.sh, and create_container.sh from inside $host_target_dir/$(basename $container_target_dir)/docker to $host_target_dir"
-cp $host_target_dir/$(basename $container_target_dir)/docker/Dockerfile $host_target_dir/Dockerfile
-cp $host_target_dir/$(basename $container_target_dir)/docker/create_image.sh $host_target_dir/create_image.sh
-cp $host_target_dir/$(basename $container_target_dir)/docker/create_container.sh $host_target_dir/create_container.sh
+#echo "Copying Dockerfile, create_image.sh, and create_container.sh from inside $host_target_dir/$(basename $container_target_dir)/docker to $host_target_dir"
+#cp $host_target_dir/$(basename $container_target_dir)/docker/Dockerfile $host_target_dir/Dockerfile
+#cp $host_target_dir/$(basename $container_target_dir)/docker/create_image.sh $host_target_dir/create_image.sh
+#cp $host_target_dir/$(basename $container_target_dir)/docker/create_container.sh $host_target_dir/create_container.sh
 
 # chmod scripts so they can run
-chmod u+x $host_target_dir/create_image.sh
-chmod u+x $host_target_dir/create_container.sh
+#chmod u+x $host_target_dir/create_image.sh
+#chmod u+x $host_target_dir/create_container.sh

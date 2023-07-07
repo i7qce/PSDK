@@ -1,5 +1,7 @@
 # Script to create a docker container from a docker image.
 #
+# For this to work, please ensure the terminal is inside the PSDK/docker/ directory when runninG
+#
 # USAGE: ./create_container.sh
 #
 
