@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Smooth Text Scroll</title>
+    <style>
+        #scrollContainer {
+            width: 80ch;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        #textContent {
+            position: relative;
+            display: inline-block;
+            backface-visibility: hidden; /* forces browser to use GPU rendering, preventing blur */
+            -webkit-font-smoothing: subpixel-antialiased;
+        }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+    <div id="scrollContainer">
+        <div id="textContent"></div>
+    </div>
+    <input type="range" min="1" max="100" value="50" id="scrollSpeed">
+    <script>
+        // Your text content here
+        var text = "Example text should be placed here, use something long";
+
+        // Split the text into words
+        var words = text.split(' ');
+
+        // Replace each word with a new version where the first two letters are bolded
+        for (var i = 0; i < words.length; i++) {
+            if (words[i].length >= 2) {
+                words[i] = '<b>' + words[i].substring(0, 2) + '</b>' + words[i].substring(2);
+            }
+        }
+
+        // Join the words back together into a single string
+        var newText = words.join(' ');
+
+        $('#textContent').html(newText);
+
+        var totalWidth = $('#textContent').width() + 80;
+
+        function startScrolling() {
+            var speed = $('#scrollSpeed').val();
+            var remaining = parseFloat($('#textContent').css('left')) + totalWidth;
+            $('#textContent').animate({left: '-=' + remaining + 'ch'}, 100*remaining * 20 / speed, 'linear', function() {
+                $('#textContent').css('left', '80ch');
+                startScrolling();
+            });
+        }
+
+        startScrolling();
+
+        $('#scrollSpeed').on('input', function() {
+            $('#textContent').stop();
+            startScrolling();
+        });
+    </script>
+</body>
+</html>
