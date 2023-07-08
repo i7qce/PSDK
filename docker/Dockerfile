@@ -7,6 +7,7 @@ FROM ubuntu
 ARG DEBIAN_FRONTEND=noninteractive
 
 ENV TERM xterm-256color
+ENV TZ=America/New_York
 
 # Below from https://code.visualstudio.com/remote/advancedcontainers/add-nonroot-user
 
@@ -36,7 +37,7 @@ RUN apt-get update
 COPY env_files/ /opt/env_files
 
 # Install all system level packages
-RUN xargs sudo apt-get install -y /opt/env_files/reqs_system.txt
+RUN apt-get install -y $(cat /opt/env_files/reqs_system.txt | tr '\n' ' ')
 
 # Install all python packages
 RUN pip install -r /opt/env_files/reqs_python.txt
@@ -51,7 +52,7 @@ RUN PATH=$PATH:/home/i7qce/.local/bin
 RUN ipython kernel install --user --name=dev_kernel
 
 # IF CPU:
-pip3 install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cpu
+#pip3 install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cpu
 
 # IF GPU:
 
